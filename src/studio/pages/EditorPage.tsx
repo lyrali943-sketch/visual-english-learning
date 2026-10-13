@@ -86,23 +86,19 @@ export function EditorPage() {
   const [exporting, setExporting] = useState(false)
   const [saving, setSaving] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
-  const [loadingFromLibrary, setLoadingFromLibrary] = useState(false)
 
   const routeId = route.name === 'editor' ? route.params.id : undefined
 
   // Open a poster straight from the library (/editor/:id).
+  const needsLibraryLoad = Boolean(routeId) && poster?.id !== routeId
+  const [loadError, setLoadError] = useState<string | null>(null)
+
   useEffect(() => {
-    if (!routeId) return
-    if (poster?.id === routeId) return
+    if (!routeId || poster?.id === routeId) return
     let alive = true
-    setLoadingFromLibrary(true)
-    openPosterFromLibrary(routeId)
-      .catch((error: unknown) => {
-        if (alive) setActionError(error instanceof Error ? error.message : 'That poster could not be opened.')
-      })
-      .finally(() => {
-        if (alive) setLoadingFromLibrary(false)
-      })
+    openPosterFromLibrary(routeId).catch((error: unknown) => {
+      if (alive) setLoadError(error instanceof Error ? error.message : 'That poster could not be opened.')
+    })
     return () => {
       alive = false
     }
@@ -187,7 +183,7 @@ export function EditorPage() {
     [regenerateModule],
   )
 
-  if (loadingFromLibrary && !poster) {
+  if (needsLibraryLoad && !poster) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <span className="flex items-center gap-3 text-[15px]" style={{ color: 'var(--color-ves-muted)' }}>
@@ -203,7 +199,7 @@ export function EditorPage() {
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] flex-col items-center justify-center px-5 text-center">
         <h1 className="ves-display text-[28px]">No poster open</h1>
         <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--color-ves-muted)' }}>
-          {actionError ?? 'Start by adding a photo, or open a saved poster from your library.'}
+          {actionError ?? loadError ?? 'Start by adding a photo, or open a saved poster from your library.'}
         </p>
         <div className="mt-6 flex gap-3">
           <StudioLink to="/upload" className="ves-btn ves-btn-primary">

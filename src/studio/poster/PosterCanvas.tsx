@@ -75,6 +75,8 @@ export const PosterCanvas = forwardRef<HTMLDivElement, PosterCanvasProps>(functi
   )
 
   // Auto-fit: shrink the body base font size until nothing is clipped.
+  // Runs on every content change, and again once web fonts / the photo have
+  // finished loading (text metrics change after that).
   const contentKey = JSON.stringify(content)
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -87,13 +89,39 @@ export const PosterCanvas = forwardRef<HTMLDivElement, PosterCanvasProps>(functi
     // report overflow — the grid container (and the poster inner) do.
     const overflowPx = () => Math.max(body.scrollHeight - body.clientHeight, inner.scrollHeight - inner.clientHeight)
 
-    let size = BODY_BASE_SIZE
-    root.style.setProperty('--poster-body-size', `${size}px`)
-    let guard = 0
-    while (overflowPx() > 1 && size > BODY_MIN_SIZE && guard < 24) {
-      size = Math.max(BODY_MIN_SIZE, size - 0.4)
+    const fit = () => {
+      let size = BODY_BASE_SIZE
       root.style.setProperty('--poster-body-size', `${size}px`)
-      guard += 1
+      let guard = 0
+      while (overflowPx() > 1 && size > BODY_MIN_SIZE && guard < 32) {
+        size = Math.max(BODY_MIN_SIZE, size - 0.3)
+        root.style.setProperty('--poster-body-size', `${size}px`)
+        guard += 1
+      }
+    }
+
+    fit()
+
+    let cancelled = false
+    const refit = () => {
+      if (!cancelled) fit()
+    }
+
+    // Fonts change text metrics — re-measure once they are ready.
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts
+    if (fonts?.ready) void fonts.ready.then(refit).catch(() => undefined)
+
+    // The photo is a data URL; decode can finish after the first layout pass.
+    const img = root.querySelector<HTMLImageElement>('.ves-poster-photo-img')
+    if (img && !img.complete) {
+      img.addEventListener('load', refit, { once: true })
+      img.addEventListener('error', refit, { once: true })
+    }
+
+    return () => {
+      cancelled = true
+      img?.removeEventListener('load', refit)
+      img?.removeEventListener('error', refit)
     }
   }, [contentKey, theme, imageAdjust.x, imageAdjust.y, imageAdjust.zoom, poster.photoDataUrl])
 

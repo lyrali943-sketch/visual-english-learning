@@ -35,9 +35,9 @@ import type {
   PreparedPhoto,
 } from '../types/poster'
 
-export type AnalysisStatus = 'idle' | 'running' | 'error' | 'done'
+type AnalysisStatus = 'idle' | 'running' | 'error' | 'done'
 
-export interface AnalysisState {
+interface AnalysisState {
   status: AnalysisStatus
   /** Index into ANALYSIS_STEPS while running. */
   step: number
