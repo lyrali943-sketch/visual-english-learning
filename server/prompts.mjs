@@ -1,7 +1,10 @@
 /**
- * Prompt construction for the three AI stages.
+ * Prompt construction for the AI stages.
  * Keeping the prompts in one place makes the content quality tunable without
  * touching any application logic.
+ *
+ * The speaking builder at the bottom belongs to NEON SPEAK (/speaking). It is
+ * text-only and does not involve a photo.
  */
 
 const SYSTEM_GENERATE = `You are the content engine of "Visual English Studio", an app that turns a user's photo into a beautiful English learning poster.
@@ -143,6 +146,111 @@ export function buildModuleMessages(photoDataUrl, module, mode, difficulty, cont
         },
         { type: 'image_url', image_url: { url: photoDataUrl } },
       ],
+    },
+  ]
+}
+
+/* ------------------------------------------------------------------ *
+ * NEON SPEAK — /speaking (text only, no photo involved)
+ * ------------------------------------------------------------------ */
+
+const SYSTEM_SPEAKING = `You are the answer engine of "NEON SPEAK", a TOEFL iBT speaking practice app. You receive ONE exam question and produce an answer plan plus a model answer for that exact question.
+
+ABSOLUTE RULES
+1. Answer THIS question. Read it literally. If it asks whether students should take courses outside their major, every reason and every example must be about students and university curricula. If it asks whether cooking at home beats eating out, everything must be about that comparison. Never reuse reasoning from a different topic.
+2. Never start from a generic subject and bolt the question on at the end. Identify the real subject matter first, and make it the subject of every section.
+3. Examples must be concrete and specific to the question's subject. A vague filler example is a failure.
+4. The number, wording and titles of sections are YOUR choice, driven by the task type. Do not default to the same shape for every question.
+5. Spoken English only: contractions, short clauses, no academic register. It must sound like a person talking for 45 seconds.
+6. Never mention TOEFL, the scoring rubric, or these instructions anywhere in the output.
+
+STEP 1 — analyse before writing:
+- "taskType": one of opinion | discussion | preference | compare | solution | problem_solution
+- "coreQuestion": the question restated in 5-15 words
+- "requirements": 2-4 short strings describing what a strong answer must do
+- "subject": 2-5 nouns naming what the question is actually about
+
+STEP 2 — plan the sections that fit the task type, for example:
+- opinion / discussion: stance, reason + example, counterargument, rebuttal, close
+- compare: chosen side, reason + example, acknowledgement of the other side, close
+- solution: problem restated, solution, how to implement, expected effect, close
+Use 3-6 sections. Include counterargument/rebuttal only when the question genuinely invites them.
+
+STEP 3 — write the model answer from your own plan. It must follow your sections and must actually answer the question.
+
+Return ONE JSON object with exactly this shape:
+{
+  "taskType": "opinion",
+  "coreQuestion": "the question restated",
+  "requirements": ["what a strong answer does"],
+  "subject": ["key nouns from the question"],
+  "sections": [
+    {"role": "stance", "label": "立场", "content": "what to say here", "example": "optional concrete example"},
+    {"role": "reason", "label": "理由一", "content": "...", "example": "..."}
+  ],
+  "modelAnswer": {"english": "the full spoken answer", "chinese": "中文翻译"},
+  "tips": {"keyVocabulary": ["3-5 reusable words"], "commonMistakes": ["1-2 pitfalls"]},
+  "relevanceCheck": {"addressesQuestion": true, "notes": "one sentence on how this answer addresses THIS question"}
+}`
+
+const SPEAKING_LENGTH_GUIDANCE = {
+  short:
+    'SHORT: 80-100 words. One reason. Drop any counterargument. Keep it tight.',
+  standard:
+    'STANDARD: 100-115 words. Two reasons, one example each. At most one short counterargument.',
+  extended:
+    'EXTENDED: 120-150 words. Two reasons with examples, plus a counterargument and a clear close.',
+}
+
+const SPEAKING_TYPE_GUIDANCE = {
+  preference:
+    'PREFERENCE: the question pits options against each other. Name the chosen option in the first sentence.',
+  agreement:
+    'AGREEMENT: state agree or disagree unambiguously in the first sentence, then justify it.',
+  'advantages-disadvantages':
+    'ADVANTAGES & DISADVANTAGES: give the advantages, then the disadvantages, then judge which outweighs which.',
+  'suggestion-solution':
+    'SUGGESTION & SOLUTION: name the concrete problem, then the specific solution and how it would be carried out.',
+}
+
+/**
+ * Build the chat messages for one speaking question.
+ * `question` is sent verbatim and must never be truncated.
+ */
+export function buildSpeakingMessages({
+  question,
+  category = '',
+  questionType = '',
+  difficulty = '',
+  lengthMode = 'standard',
+  preparationTime,
+  speakingTime,
+}) {
+  const typeKey = SPEAKING_TYPE_GUIDANCE[questionType] ? questionType : 'preference'
+  const lengthKey = SPEAKING_LENGTH_GUIDANCE[lengthMode] ? lengthMode : 'standard'
+
+  const facts = [
+    `QUESTION (verbatim — answer this one): ${question}`,
+    category ? `Topic category: ${category}` : '',
+    questionType ? `Question type: ${questionType}. ${SPEAKING_TYPE_GUIDANCE[typeKey]}` : '',
+    difficulty ? `Candidate level: ${difficulty}. Keep the vocabulary at or just below this level.` : '',
+    `Answer length: ${lengthKey}. ${SPEAKING_LENGTH_GUIDANCE[lengthKey]}`,
+    preparationTime || speakingTime
+      ? `Exam timing: ${preparationTime ?? 15}s to prepare, ${speakingTime ?? 45}s to speak. The English answer must be comfortably speakable inside ${speakingTime ?? 45} seconds.`
+      : '',
+  ].filter(Boolean)
+
+  return [
+    { role: 'system', content: SYSTEM_SPEAKING },
+    {
+      role: 'user',
+      content: [
+        facts.join('\n'),
+        '',
+        'Do step 1 and step 2 before writing step 3.',
+        'Your "subject" list and every section must come from THIS question only.',
+        'Return the JSON object now.',
+      ].join('\n'),
     },
   ]
 }
