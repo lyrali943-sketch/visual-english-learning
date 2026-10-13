@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #08090D;
+  --color-bg-secondary: #0B0C12;
+  --color-bg-tertiary: #101019;
+  --color-bg-card: #12121C;
+  --color-bg-card-hover: #161622;
+
+  --color-purple-primary: #8B5CF6;
+  --color-purple-light: #A78BFA;
+  --color-purple-dark: #5B21B6;
+  --color-purple-blue: #6D5DFB;
+  --color-purple-accent: #C4B5FD;
+
+  --color-green-status: #C7F36B;
+
+  --color-text-primary: #F5F5FA;
+  --color-text-secondary: #9695A8;
+  --color-text-tertiary: #6B6A7C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.14);
+
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * CRITICAL: base/reset rules MUST live inside @layer base.
+ * Tailwind v4 emits every utility inside @layer utilities.
+ * Per the CSS cascade spec, *unlayered* styles always beat layered styles,
+ * so an unlayered `* { margin:0; padding:0 }` would silently override
+ * pt-20 / px-6 / mx-auto / mb-* across the whole app.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(139, 92, 246, 0.3);
+    color: #fff;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid var(--color-purple-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Scrollbar chrome — safe to keep unlayered (no utility competes with it) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

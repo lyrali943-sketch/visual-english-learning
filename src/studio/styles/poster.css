@@ -1,0 +1,526 @@
+/* ==========================================================================
+   Visual English Studio 鈥?the learning poster itself.
+   IMPORTANT: this file is intentionally independent from the site UI.
+   It is self-contained (no Tailwind, no external assets) because it is also
+   embedded as raw text when exporting the poster to a high-resolution PNG.
+   Logical canvas: 800 x 1200 (2:3). Export scales it up (1600x2400 / 2400x3600).
+
+   Body typography is expressed in `em` against a single base size
+   (--poster-body-size). The PosterCanvas component measures the rendered
+   columns and lowers that base size a few steps when content would overflow,
+   so long content is never clipped 鈥?it is laid out slightly smaller.
+   ========================================================================== */
+
+.ves-poster {
+  --poster-body-size: 15px;
+
+  --poster-bg: #f7f2e9;
+  --poster-ink: #432817;
+  --poster-muted: #62564b;
+  --poster-accent: #c84d3a;
+  --poster-sand: #e8d9c5;
+  --poster-card: #fffdf8;
+  --poster-line: rgba(67, 40, 23, 0.16);
+  --poster-photo-shadow: rgba(67, 40, 23, 0.32);
+
+  position: relative;
+  width: 800px;
+  height: 1200px;
+  flex: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--poster-bg);
+  color: var(--poster-ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', system-ui,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Poster themes (subtle variations of the same editorial design) ------ */
+.ves-poster[data-theme='cream'] {
+  --poster-bg: #f7f2e9;
+  --poster-ink: #432817;
+  --poster-muted: #62564b;
+  --poster-accent: #c84d3a;
+  --poster-sand: #e8d9c5;
+  --poster-card: #fffdf8;
+  --poster-line: rgba(67, 40, 23, 0.16);
+  --poster-photo-shadow: rgba(67, 40, 23, 0.32);
+}
+.ves-poster[data-theme='sage'] {
+  --poster-bg: #f1efe3;
+  --poster-ink: #2c3126;
+  --poster-muted: #575d4d;
+  --poster-accent: #4e6b50;
+  --poster-sand: #dde1cf;
+  --poster-card: #faf9f1;
+  --poster-line: rgba(44, 49, 38, 0.16);
+  --poster-photo-shadow: rgba(44, 49, 38, 0.3);
+}
+.ves-poster[data-theme='blossom'] {
+  --poster-bg: #f8efe9;
+  --poster-ink: #3f252b;
+  --poster-muted: #6a5058;
+  --poster-accent: #b4536b;
+  --poster-sand: #eed8d2;
+  --poster-card: #fffaf7;
+  --poster-line: rgba(63, 37, 43, 0.16);
+  --poster-photo-shadow: rgba(63, 37, 43, 0.3);
+}
+
+/* Soft paper vignette + barely-there grain */
+.ves-poster-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(140% 120% at 50% 115%, var(--poster-sand), transparent 60%);
+}
+.ves-poster-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(var(--poster-line) 0.5px, transparent 0.5px);
+  background-size: 5px 5px;
+}
+
+.ves-poster-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 42px 46px 28px;
+}
+
+/* --- Header / visual area ------------------------------------------------ */
+.ves-poster-brandrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ves-poster-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.ves-poster-brandname {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--poster-ink);
+}
+.ves-poster-theme-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--poster-accent);
+  border: 1px solid var(--poster-accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  opacity: 0.9;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ves-poster-hero {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1.04fr 0.96fr;
+  gap: 26px;
+  align-items: start;
+}
+.ves-poster-kicker {
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--poster-accent);
+}
+.ves-poster-title {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-size: 57px;
+  font-weight: 560;
+  line-height: 0.98;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  margin: 8px 0 6px;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.ves-poster-squiggle {
+  width: 92px;
+  margin-bottom: 10px;
+}
+.ves-poster-subtitle {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 19.5px;
+  line-height: 1.3;
+  color: var(--poster-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.ves-poster-meta {
+  margin-top: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ves-poster-meta-chip {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--poster-muted);
+  border: 1px solid var(--poster-line);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: var(--poster-card);
+}
+
+.ves-poster-photo-frame {
+  position: relative;
+  height: 226px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--poster-sand);
+  border: 1px solid var(--poster-line);
+  box-shadow: 0 18px 38px -18px var(--poster-photo-shadow);
+}
+.ves-poster-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform-origin: center;
+}
+.ves-poster-photo-caption {
+  margin-top: 8px;
+  text-align: right;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 20px;
+  color: var(--poster-muted);
+}
+
+/* Hand-drawn annotations around the photo */
+.ves-annotation {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 21px;
+  line-height: 1;
+  color: var(--poster-ink);
+  white-space: nowrap;
+}
+.ves-annotation-label {
+  background: var(--poster-card);
+  border: 1.5px solid var(--poster-accent);
+  border-radius: 999px;
+  padding: 3px 10px;
+  box-shadow: 0 6px 14px -8px var(--poster-photo-shadow);
+}
+.ves-annotation svg {
+  display: block;
+  overflow: visible;
+}
+
+/* --- Body (01鈥?4) 鈥?em-based, auto-fitted -------------------------------- */
+.ves-poster-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 30px;
+  align-content: start;
+  padding-top: 18px;
+  font-size: var(--poster-body-size);
+  overflow: hidden;
+}
+.ves-poster-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.ves-module {
+  margin-bottom: 14px;
+}
+.ves-module:last-child {
+  margin-bottom: 0;
+}
+.ves-module-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+}
+.ves-module-num {
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.95em;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--poster-accent);
+}
+.ves-module-title {
+  font-size: 0.87em;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--poster-accent);
+  white-space: nowrap;
+}
+.ves-module-rule {
+  flex: 1;
+  height: 0;
+  border-top: 1.5px dashed var(--poster-accent);
+  opacity: 0.5;
+  min-width: 10px;
+}
+
+/* 01 Vocabulary */
+.ves-vocab-item {
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--poster-line);
+}
+.ves-vocab-item:last-child {
+  border-bottom: none;
+}
+.ves-vocab-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.ves-vocab-term {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.14em;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.ves-vocab-leader {
+  flex: 1;
+  min-width: 8px;
+  border-bottom: 1px dotted var(--poster-line);
+  transform: translateY(-3px);
+}
+.ves-vocab-translation {
+  font-size: 0.86em;
+  color: var(--poster-muted);
+  white-space: nowrap;
+}
+.ves-vocab-explanation {
+  margin-top: 1px;
+  font-size: 0.83em;
+  line-height: 1.38;
+  color: var(--poster-muted);
+}
+
+/* 02 Phrases */
+.ves-phrase-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--poster-line);
+}
+.ves-phrase-item:last-child {
+  border-bottom: none;
+}
+.ves-phrase-head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.ves-phrase-text {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.08em;
+  font-weight: 600;
+}
+.ves-phrase-translation {
+  font-size: 0.82em;
+  color: var(--poster-muted);
+}
+.ves-phrase-explanation {
+  margin-top: 1px;
+  font-size: 0.82em;
+  line-height: 1.38;
+  color: var(--poster-muted);
+}
+.ves-phrase-example {
+  margin-top: 2px;
+  font-size: 0.82em;
+  font-style: italic;
+  line-height: 1.38;
+  color: var(--poster-muted);
+  opacity: 0.92;
+}
+
+/* 03 Sentence patterns */
+.ves-pattern {
+  background: var(--poster-card);
+  border: 1px solid var(--poster-line);
+  border-left: 3px solid var(--poster-accent);
+  border-radius: 11px;
+  padding: 10px 12px 9px;
+  margin-bottom: 8px;
+}
+.ves-pattern:last-child {
+  margin-bottom: 0;
+}
+.ves-pattern-sentence {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.06em;
+  font-weight: 600;
+  line-height: 1.28;
+}
+.ves-pattern-translation {
+  margin-top: 2px;
+  font-size: 0.82em;
+  color: var(--poster-muted);
+}
+.ves-pattern-example {
+  margin-top: 5px;
+  font-size: 0.87em;
+  line-height: 1.38;
+}
+.ves-pattern-example-t {
+  font-size: 0.8em;
+  color: var(--poster-muted);
+  line-height: 1.38;
+}
+.ves-pattern-subs {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ves-pattern-sub {
+  font-size: 0.73em;
+  font-weight: 600;
+  color: var(--poster-ink);
+  background: var(--poster-sand);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* 04 Model response */
+.ves-model {
+  position: relative;
+}
+.ves-model-quote {
+  position: absolute;
+  top: -20px;
+  left: -5px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--poster-accent);
+  opacity: 0.16;
+  pointer-events: none;
+}
+.ves-model-en {
+  position: relative;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 0.95em;
+  font-weight: 400;
+  line-height: 1.5;
+  /* Safety net: after the auto-fit reaches its floor, very long manual edits
+     are clamped instead of being clipped mid-glyph. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 11;
+  overflow: hidden;
+}
+.ves-model-zh {
+  margin-top: 6px;
+  font-size: 0.82em;
+  line-height: 1.55;
+  color: var(--poster-muted);
+}
+
+/* --- Footer: 05 Speaking challenge (also em-based, auto-fitted) ---------- */
+.ves-poster-bottom {
+  flex: none;
+  margin-top: 12px;
+  border-top: 1.5px solid var(--poster-sand);
+  padding-top: 14px;
+  font-size: var(--poster-body-size);
+}
+.ves-challenge {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+  align-items: flex-start;
+}
+.ves-challenge-num {
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.65em;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--poster-accent);
+  min-width: 22px;
+}
+.ves-challenge-q {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.03em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.ves-challenge-t {
+  margin-top: 1px;
+  font-size: 0.82em;
+  line-height: 1.38;
+  color: var(--poster-muted);
+}
+.ves-poster-footline {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--poster-muted);
+}
+.ves-poster-footline svg {
+  display: block;
+}
+.ves-poster-demo-mark {
+  color: var(--poster-accent);
+  letter-spacing: 0.2em;
+}
+
+/* --- Line clamps (guard against overflow) ------------------------------- */
+.ves-clamp-1,
+.ves-clamp-2,
+.ves-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ves-clamp-1 {
+  -webkit-line-clamp: 1;
+}
+.ves-clamp-2 {
+  -webkit-line-clamp: 2;
+}
+.ves-clamp-3 {
+  -webkit-line-clamp: 3;
+}
