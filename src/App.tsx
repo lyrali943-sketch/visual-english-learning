@@ -61,16 +61,16 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090D] text-white">
+    <div className="min-h-screen bg-[#F6F8FC] text-[#0D1020]">
       <Background />
-      {/* The Speaking Arena uses a light, blue-white theme. Only that page opts
-          in; Home / Topic Lab / Progress / Settings keep the original dark bar. */}
+      {/* The whole NEON SPEAK flow — Home, Topic Lab, the practice flow (topic
+          selection / preparation / speaking / review) and Settings — shares one
+          light workspace, so the navbar has no theme switch. */}
       <Navbar
         currentPage={currentPage}
         onNavigate={handleNavigate}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
-        tone={currentPage === 'arena' ? 'light' : 'dark'}
       />
 
       <main className="relative z-10">

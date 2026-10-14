@@ -33,7 +33,9 @@ export default function Background() {
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
         size: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.3 + 0.1,
+        /* Kept low so the purple motes stay atmospheric on the white surface
+           and never compete with body text. */
+        opacity: Math.random() * 0.18 + 0.06,
       }));
     };
 

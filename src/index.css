@@ -7,26 +7,30 @@
 @import "./studio/styles/poster.css";
 
 @theme {
-  --color-bg-primary: #08090D;
-  --color-bg-secondary: #0B0C12;
-  --color-bg-tertiary: #101019;
-  --color-bg-card: #12121C;
-  --color-bg-card-hover: #161622;
+  /* NEON SPEAK light surface. These tokens drive Home / Topic Lab / Progress /
+     Settings and the shared shell; the practice flow uses the equivalent
+     --spk-* set in src/styles/speaking.css. Both resolve to the same white
+     workspace so the whole product reads as one system. */
+  --color-bg-primary: #f6f8fc;
+  --color-bg-secondary: #eef2f9;
+  --color-bg-tertiary: #e6ebf5;
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #f8fafc;
 
-  --color-purple-primary: #8B5CF6;
-  --color-purple-light: #A78BFA;
-  --color-purple-dark: #5B21B6;
-  --color-purple-blue: #6D5DFB;
-  --color-purple-accent: #C4B5FD;
+  --color-purple-primary: #7c3aed;
+  --color-purple-light: #a78bfa;
+  --color-purple-dark: #6d28d9;
+  --color-purple-blue: #6366f1;
+  --color-purple-accent: #ede9fe;
 
-  --color-green-status: #C7F36B;
+  --color-green-status: #16a34a;
 
-  --color-text-primary: #F5F5FA;
-  --color-text-secondary: #9695A8;
-  --color-text-tertiary: #6B6A7C;
+  --color-text-primary: #0d1020;
+  --color-text-secondary: #5b6479;
+  --color-text-tertiary: #7b8497;
 
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.14);
+  --color-border: rgba(13, 16, 32, 0.09);
+  --color-border-hover: rgba(13, 16, 32, 0.18);
 
   --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
@@ -86,12 +90,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(13, 16, 32, 0.18);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(13, 16, 32, 0.3);
 }
 
 /* Reduced motion */

@@ -80,13 +80,13 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
           <motion.p variants={itemVariants} className="text-[#A78BFA] text-sm font-medium tracking-wider uppercase mb-4">
             Your Daily Speaking Session
           </motion.p>
-          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
+          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#0D1020] mb-4 tracking-tight">
             Think faster.<br />
             <span className="bg-gradient-to-r from-[#8B5CF6] to-[#6D5DFB] bg-clip-text text-transparent">
               Speak with confidence.
             </span>
           </motion.h1>
-          <motion.p variants={itemVariants} className="text-[#9695A8] text-lg max-w-2xl mx-auto mb-8">
+          <motion.p variants={itemVariants} className="text-[#5B6479] text-lg max-w-2xl mx-auto mb-8">
             Practice real-world topics, build clear arguments, and improve your spoken English one question at a time.
           </motion.p>
           <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
@@ -99,7 +99,7 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
             </button>
             <button
               onClick={() => onNavigate('topics')}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08] text-white font-medium hover:bg-white/[0.1] transition-colors"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#F1F4F9] border border-[#E4E8F0] text-[#0D1020] font-medium hover:bg-[#EAEFF7] transition-colors"
             >
               Explore Topics
             </button>
@@ -129,51 +129,51 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {/* Today's Practice */}
-          <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+          <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-[#8B5CF6]/15 flex items-center justify-center">
                 <Clock size={18} className="text-[#A78BFA]" />
               </div>
-              <span className="text-[#9695A8] text-sm">Today's Practice</span>
+              <span className="text-[#5B6479] text-sm">Today's Practice</span>
             </div>
-            <p className="text-3xl font-bold text-white">{todayPractice.length}</p>
-            <p className="text-[#6B6A7C] text-xs mt-1">sessions completed</p>
+            <p className="text-3xl font-bold text-[#0D1020]">{todayPractice.length}</p>
+            <p className="text-[#7B8497] text-xs mt-1">sessions completed</p>
           </div>
 
           {/* Streak */}
-          <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+          <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-[#C7F36B]/15 flex items-center justify-center">
-                <Flame size={18} className="text-[#C7F36B]" />
+              <div className="w-10 h-10 rounded-xl bg-[#16A34A]/15 flex items-center justify-center">
+                <Flame size={18} className="text-[#16A34A]" />
               </div>
-              <span className="text-[#9695A8] text-sm">Practice Streak</span>
+              <span className="text-[#5B6479] text-sm">Practice Streak</span>
             </div>
-            <p className="text-3xl font-bold text-white">{streak}</p>
-            <p className="text-[#6B6A7C] text-xs mt-1">{streak === 1 ? 'day' : 'days'} in a row</p>
+            <p className="text-3xl font-bold text-[#0D1020]">{streak}</p>
+            <p className="text-[#7B8497] text-xs mt-1">{streak === 1 ? 'day' : 'days'} in a row</p>
           </div>
 
           {/* Total Sessions */}
-          <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+          <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-[#6D5DFB]/15 flex items-center justify-center">
                 <BookOpen size={18} className="text-[#A78BFA]" />
               </div>
-              <span className="text-[#9695A8] text-sm">Total Sessions</span>
+              <span className="text-[#5B6479] text-sm">Total Sessions</span>
             </div>
-            <p className="text-3xl font-bold text-white">{history.length}</p>
-            <p className="text-[#6B6A7C] text-xs mt-1">all time</p>
+            <p className="text-3xl font-bold text-[#0D1020]">{history.length}</p>
+            <p className="text-[#7B8497] text-xs mt-1">all time</p>
           </div>
 
           {/* Favorites */}
-          <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+          <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center">
                 <Heart size={18} className="text-pink-400" />
               </div>
-              <span className="text-[#9695A8] text-sm">Favorites</span>
+              <span className="text-[#5B6479] text-sm">Favorites</span>
             </div>
-            <p className="text-3xl font-bold text-white">{favorites.length}</p>
-            <p className="text-[#6B6A7C] text-xs mt-1">saved topics</p>
+            <p className="text-3xl font-bold text-[#0D1020]">{favorites.length}</p>
+            <p className="text-[#7B8497] text-xs mt-1">saved topics</p>
           </div>
         </motion.div>
 
@@ -187,16 +187,16 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
           >
             {/* Recent Topics */}
             {recentTopics.length > 0 && (
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4">Recent Topics</h3>
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6">
+                <h3 className="text-[#0D1020] font-semibold mb-4">Recent Topics</h3>
                 <div className="space-y-3">
                   {recentTopics.map((topic, i) => (
                     <button
                       key={i}
                       onClick={() => onStartPractice(topic)}
-                      className="w-full text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors group"
+                      className="w-full text-left p-3 rounded-xl bg-[#F7F9FC] hover:bg-[#F1F4F9] transition-colors group"
                     >
-                      <p className="text-[#9695A8] text-sm line-clamp-2 group-hover:text-white transition-colors">
+                      <p className="text-[#5B6479] text-sm line-clamp-2 group-hover:text-[#0D1020] transition-colors">
                         {topic.question}
                       </p>
                     </button>
@@ -207,16 +207,16 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
 
             {/* Favorite Topics */}
             {favoriteTopics.length > 0 && (
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4">Favorite Topics</h3>
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6">
+                <h3 className="text-[#0D1020] font-semibold mb-4">Favorite Topics</h3>
                 <div className="space-y-3">
                   {favoriteTopics.map((topic, i) => (
                     <button
                       key={i}
                       onClick={() => onStartPractice(topic)}
-                      className="w-full text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors group"
+                      className="w-full text-left p-3 rounded-xl bg-[#F7F9FC] hover:bg-[#F1F4F9] transition-colors group"
                     >
-                      <p className="text-[#9695A8] text-sm line-clamp-2 group-hover:text-white transition-colors">
+                      <p className="text-[#5B6479] text-sm line-clamp-2 group-hover:text-[#0D1020] transition-colors">
                         {topic.question}
                       </p>
                     </button>
@@ -235,7 +235,7 @@ export default function Home({ onNavigate, onStartPractice, onShowFramework, red
             transition={{ delay: reducedMotion ? 0 : 0.9 }}
             className="text-center py-12"
           >
-            <p className="text-[#6B6A7C] text-sm">
+            <p className="text-[#7B8497] text-sm">
               Your practice history will appear here after your first session.
             </p>
           </motion.div>

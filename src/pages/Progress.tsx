@@ -100,8 +100,8 @@ export default function Progress({ onNavigate }: ProgressProps) {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Your Progress</h1>
-            <p className="text-[#9695A8]">Track your speaking practice journey</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#0D1020] mb-2">Your Progress</h1>
+            <p className="text-[#5B6479]">Track your speaking practice journey</p>
           </div>
           {history.length > 0 && (
             <button
@@ -124,8 +124,8 @@ export default function Progress({ onNavigate }: ProgressProps) {
             <div className="w-20 h-20 rounded-2xl bg-[#8B5CF6]/10 flex items-center justify-center mx-auto mb-6">
               <BarChart3 size={36} className="text-[#A78BFA]" />
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">No Practice Data Yet</h2>
-            <p className="text-[#9695A8] mb-6 max-w-md mx-auto">
+            <h2 className="text-xl font-semibold text-[#0D1020] mb-2">No Practice Data Yet</h2>
+            <p className="text-[#5B6479] mb-6 max-w-md mx-auto">
               Start practicing to see your progress, statistics, and achievements here.
             </p>
             <button
@@ -144,36 +144,36 @@ export default function Progress({ onNavigate }: ProgressProps) {
               transition={{ delay: 0.1 }}
               className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
             >
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Target size={16} className="text-[#A78BFA]" />
-                  <span className="text-[#9695A8] text-xs">Total Sessions</span>
+                  <span className="text-[#5B6479] text-xs">Total Sessions</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{stats.totalSessions}</p>
+                <p className="text-2xl font-bold text-[#0D1020]">{stats.totalSessions}</p>
               </div>
 
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock size={16} className="text-[#C7F36B]" />
-                  <span className="text-[#9695A8] text-xs">Total Time</span>
+                  <Clock size={16} className="text-[#16A34A]" />
+                  <span className="text-[#5B6479] text-xs">Total Time</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{formatTime(stats.totalDuration)}</p>
+                <p className="text-2xl font-bold text-[#0D1020]">{formatTime(stats.totalDuration)}</p>
               </div>
 
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp size={16} className="text-[#A78BFA]" />
-                  <span className="text-[#9695A8] text-xs">Avg Duration</span>
+                  <span className="text-[#5B6479] text-xs">Avg Duration</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{stats.avgDuration}s</p>
+                <p className="text-2xl font-bold text-[#0D1020]">{stats.avgDuration}s</p>
               </div>
 
-              <div className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-5">
+              <div className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Award size={16} className="text-[#C7F36B]" />
-                  <span className="text-[#9695A8] text-xs">Streak</span>
+                  <Award size={16} className="text-[#16A34A]" />
+                  <span className="text-[#5B6479] text-xs">Streak</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{stats.streak} days</p>
+                <p className="text-2xl font-bold text-[#0D1020]">{stats.streak} days</p>
               </div>
             </motion.div>
 
@@ -184,9 +184,9 @@ export default function Progress({ onNavigate }: ProgressProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6"
+                className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6"
               >
-                <h3 className="text-white font-semibold mb-4">Last 7 Days</h3>
+                <h3 className="text-[#0D1020] font-semibold mb-4">Last 7 Days</h3>
                 <div className="flex items-end gap-2 h-32">
                   {stats.last7Days.map((day, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
@@ -197,7 +197,7 @@ export default function Progress({ onNavigate }: ProgressProps) {
                         className="w-full rounded-t-lg bg-gradient-to-t from-[#8B5CF6] to-[#6D5DFB] min-h-[4px]"
                         style={{ minHeight: day.count > 0 ? '8px' : '4px' }}
                       />
-                      <span className="text-[#6B6A7C] text-xs">
+                      <span className="text-[#7B8497] text-xs">
                         {day.date.toLocaleDateString('en', { weekday: 'short' })}
                       </span>
                     </div>
@@ -210,9 +210,9 @@ export default function Progress({ onNavigate }: ProgressProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6"
+                className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6"
               >
-                <h3 className="text-white font-semibold mb-4">Topic Distribution</h3>
+                <h3 className="text-[#0D1020] font-semibold mb-4">Topic Distribution</h3>
                 <div className="space-y-3">
                   {Object.entries(stats.categoryCount)
                     .sort((a, b) => b[1] - a[1])
@@ -223,10 +223,10 @@ export default function Progress({ onNavigate }: ProgressProps) {
                       return (
                         <div key={cat}>
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-[#9695A8]">{category?.name || cat}</span>
-                            <span className="text-[#6B6A7C]">{count} ({percentage}%)</span>
+                            <span className="text-[#5B6479]">{category?.name || cat}</span>
+                            <span className="text-[#7B8497]">{count} ({percentage}%)</span>
                           </div>
-                          <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[#F1F4F9] rounded-full overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${percentage}%` }}
@@ -246,21 +246,21 @@ export default function Progress({ onNavigate }: ProgressProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6"
+              className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6"
             >
-              <h3 className="text-white font-semibold mb-4">Topic Coverage</h3>
+              <h3 className="text-[#0D1020] font-semibold mb-4">Topic Coverage</h3>
               <div className="flex items-center gap-4 mb-2">
-                <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-[#F1F4F9] rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${stats.practicedPercentage}%` }}
                     transition={{ delay: 0.6 }}
-                    className="h-full bg-gradient-to-r from-[#C7F36B] to-[#8B5CF6] rounded-full"
+                    className="h-full bg-gradient-to-r from-[#16A34A] to-[#8B5CF6] rounded-full"
                   />
                 </div>
-                <span className="text-[#9695A8] text-sm">{stats.practicedPercentage}%</span>
+                <span className="text-[#5B6479] text-sm">{stats.practicedPercentage}%</span>
               </div>
-              <p className="text-[#6B6A7C] text-xs">
+              <p className="text-[#7B8497] text-xs">
                 You've practiced {stats.uniqueTopics} out of 104 topics
               </p>
             </motion.div>
@@ -273,16 +273,16 @@ export default function Progress({ onNavigate }: ProgressProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full"
+              className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-6 max-w-sm w-full"
             >
-              <h3 className="text-white font-semibold mb-2">Clear All History?</h3>
-              <p className="text-[#9695A8] text-sm mb-6">
+              <h3 className="text-[#0D1020] font-semibold mb-2">Clear All History?</h3>
+              <p className="text-[#5B6479] text-sm mb-6">
                 This will permanently delete all your practice records. This action cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirmClear(false)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-white/[0.06] text-white text-sm hover:bg-white/[0.1] transition-colors"
+                  className="flex-1 px-4 py-2 rounded-lg bg-[#F1F4F9] text-[#0D1020] text-sm hover:bg-[#EAEFF7] transition-colors"
                 >
                   Cancel
                 </button>

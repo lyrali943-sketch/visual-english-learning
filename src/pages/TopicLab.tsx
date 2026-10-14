@@ -85,8 +85,8 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Explore Your Next Topic</h1>
-          <p className="text-[#9695A8]">Find a question. Build an argument. Make your point.</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#0D1020] mb-2">Explore Your Next Topic</h1>
+          <p className="text-[#5B6479]">Find a question. Build an argument. Make your point.</p>
         </motion.div>
 
         {/* Search & Filters */}
@@ -94,22 +94,22 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#12121C] border border-white/[0.08] rounded-2xl p-4 sm:p-6 mb-6"
+          className="bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-4 sm:p-6 mb-6"
         >
           {/* Search */}
           <div className="relative mb-4">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6A7C]" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7B8497]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search topics by keyword..."
-              className="w-full bg-[#0B0C12] border border-white/[0.08] rounded-xl pl-12 pr-4 py-3 text-white placeholder-[#6B6A7C] focus:outline-none focus:border-[#8B5CF6]/50 transition-colors"
+              className="w-full bg-[#EEF2F9] border border-[#E4E8F0] rounded-xl pl-12 pr-4 py-3 text-[#0D1020] placeholder-[#7B8497] focus:outline-none focus:border-[#8B5CF6]/50 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B6A7C] hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8497] hover:text-[#0D1020]"
               >
                 <X size={16} />
               </button>
@@ -121,7 +121,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-[#0B0C12] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-[#9695A8] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
+              className="bg-[#EEF2F9] border border-[#E4E8F0] rounded-lg px-3 py-2 text-sm text-[#5B6479] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
             >
               <option value="all">All Categories</option>
               {CATEGORIES.map(cat => (
@@ -132,7 +132,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="bg-[#0B0C12] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-[#9695A8] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
+              className="bg-[#EEF2F9] border border-[#E4E8F0] rounded-lg px-3 py-2 text-sm text-[#5B6479] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
             >
               <option value="all">All Types</option>
               {QUESTION_TYPES.map(type => (
@@ -143,7 +143,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="bg-[#0B0C12] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-[#9695A8] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
+              className="bg-[#EEF2F9] border border-[#E4E8F0] rounded-lg px-3 py-2 text-sm text-[#5B6479] focus:outline-none focus:border-[#8B5CF6]/50 cursor-pointer"
             >
               <option value="all">All Difficulties</option>
               {DIFFICULTIES.map(d => (
@@ -156,7 +156,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 showFavoritesOnly
                   ? 'bg-pink-500/15 text-pink-400'
-                  : 'bg-[#0B0C12] border border-white/[0.08] text-[#9695A8] hover:text-white'
+                  : 'bg-[#EEF2F9] border border-[#E4E8F0] text-[#5B6479] hover:text-[#0D1020]'
               }`}
             >
               <Heart size={14} fill={showFavoritesOnly ? 'currentColor' : 'none'} />
@@ -174,8 +174,8 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
 
           {/* Active filters */}
           {(selectedCategory !== 'all' || selectedType !== 'all' || selectedDifficulty !== 'all' || searchQuery || showFavoritesOnly) && (
-            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/[0.06]">
-              <span className="text-[#6B6A7C] text-xs">Active filters:</span>
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[#E9EDF4]">
+              <span className="text-[#7B8497] text-xs">Active filters:</span>
               {searchQuery && (
                 <span className="px-2 py-1 rounded bg-[#8B5CF6]/15 text-[#A78BFA] text-xs">"{searchQuery}"</span>
               )}
@@ -193,7 +193,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
               )}
               <button
                 onClick={clearFilters}
-                className="text-[#6B6A7C] text-xs hover:text-white ml-auto"
+                className="text-[#7B8497] text-xs hover:text-[#0D1020] ml-auto"
               >
                 Clear all
               </button>
@@ -203,7 +203,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-[#6B6A7C] text-sm">
+          <p className="text-[#7B8497] text-sm">
             {filteredTopics.length} topic{filteredTopics.length !== 1 ? 's' : ''} found
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.03, 0.5) }}
-                className="group bg-[#12121C] border border-white/[0.08] rounded-2xl p-5 hover:border-white/[0.14] hover:-translate-y-1 transition-all duration-200"
+                className="group bg-[#FFFFFF] border border-[#E4E8F0] rounded-2xl p-5 hover:border-[#CDD5E3] hover:-translate-y-1 transition-all duration-200"
               >
                 {/* Category & Difficulty */}
                 <div className="flex items-center gap-2 mb-3">
@@ -225,7 +225,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
                     {getCategoryName(topic.category)}
                   </span>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    topic.difficulty === 'Easy' ? 'bg-[#C7F36B]/15 text-[#C7F36B]' :
+                    topic.difficulty === 'Easy' ? 'bg-[#16A34A]/15 text-[#16A34A]' :
                     topic.difficulty === 'Medium' ? 'bg-yellow-500/15 text-yellow-400' :
                     'bg-red-500/15 text-red-400'
                   }`}>
@@ -234,12 +234,12 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
                 </div>
 
                 {/* Question */}
-                <p className="text-white text-sm leading-relaxed mb-4 line-clamp-3">
+                <p className="text-[#0D1020] text-sm leading-relaxed mb-4 line-clamp-3">
                   {topic.question}
                 </p>
 
                 {/* Meta */}
-                <div className="flex items-center gap-3 text-xs text-[#6B6A7C] mb-4">
+                <div className="flex items-center gap-3 text-xs text-[#7B8497] mb-4">
                   <span>{getTypeName(topic.questionType)}</span>
                   <span>•</span>
                   <span>Prep: {topic.preparationTime}s</span>
@@ -264,7 +264,7 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
                     className={`p-2 rounded-lg transition-colors ${
                       favorites.includes(topic.id)
                         ? 'bg-pink-500/15 text-pink-400'
-                        : 'bg-white/[0.06] text-[#6B6A7C] hover:text-white'
+                        : 'bg-[#F1F4F9] text-[#7B8497] hover:text-[#0D1020]'
                     }`}
                     aria-label={favorites.includes(topic.id) ? 'Remove from favorites' : 'Add to favorites'}
                   >
@@ -280,8 +280,8 @@ export default function TopicLab({ onStartPractice }: TopicLabProps) {
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
-            <p className="text-[#6B6A7C] text-lg mb-2">No topics found</p>
-            <p className="text-[#6B6A7C] text-sm mb-4">Try adjusting your filters or search query</p>
+            <p className="text-[#7B8497] text-lg mb-2">No topics found</p>
+            <p className="text-[#7B8497] text-sm mb-4">Try adjusting your filters or search query</p>
             <button
               onClick={clearFilters}
               className="px-4 py-2 rounded-lg bg-[#8B5CF6]/15 text-[#A78BFA] text-sm font-medium hover:bg-[#8B5CF6]/25 transition-colors"
