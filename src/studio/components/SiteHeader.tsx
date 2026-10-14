@@ -20,9 +20,10 @@ export function SiteHeader() {
       className="sticky top-0 z-50 border-b"
       style={{
         borderColor: 'var(--color-ves-line)',
-        background: 'rgba(11, 7, 23, 0.62)',
-        backdropFilter: 'blur(18px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+        background: 'rgba(255, 255, 255, 0.78)',
+        boxShadow: '0 1px 0 rgba(255,255,255,0.9) inset, 0 10px 30px -24px rgba(16,35,74,0.45)',
+        backdropFilter: 'blur(18px) saturate(170%)',
+        WebkitBackdropFilter: 'blur(18px) saturate(170%)',
       }}
     >
       <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center justify-between gap-3 px-5 sm:px-8">
@@ -30,8 +31,9 @@ export function SiteHeader() {
           <span
             className="flex h-9 w-9 items-center justify-center rounded-xl"
             style={{
-              background: 'linear-gradient(135deg, #8B5CF6, #6D5DFB)',
-              boxShadow: '0 6px 18px -6px rgba(139, 92, 246, 0.8), inset 0 1px 0 rgba(255,255,255,0.25)',
+              background: 'var(--color-ves-accent-fill)',
+              boxShadow:
+                '0 6px 16px -8px rgba(47, 95, 224, 0.85), inset 0 1px 0 rgba(255,255,255,0.28)',
             }}
           >
             <BrandMark size={19} color="#FFFFFF" strokeWidth={1.9} />

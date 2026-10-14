@@ -29,11 +29,18 @@ export function getConfig() {
   const baseUrl = (process.env.VES_AI_BASE_URL ?? DEFAULT_BASE_URL).trim().replace(/\/+$/, '')
   const model = (process.env.VES_AI_MODEL ?? 'gpt-4o-mini').trim()
   const provider = (process.env.VES_AI_PROVIDER ?? 'openai-compatible').trim()
+
+  // Only "true" (case-insensitive) enables it. Anything else — including a typo
+  // — keeps X-Forwarded-For ignored, which is the safe default: a client must
+  // never be able to choose its own rate-limit key by setting a header.
+  const trustProxy = (process.env.VES_TRUST_PROXY ?? '').trim().toLowerCase() === 'true'
+
   return {
     apiKey,
     baseUrl,
     model,
     provider,
+    trustProxy,
     configured: apiKey.length > 0,
     port: Number.parseInt(process.env.PORT ?? '', 10) || 8080,
     projectRoot,

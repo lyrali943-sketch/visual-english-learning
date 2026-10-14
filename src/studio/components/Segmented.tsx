@@ -39,7 +39,18 @@ export function Segmented<T extends string>({
       role="radiogroup"
       aria-label={name}
       className={className}
-      style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', gap: stacked ? 8 : 0, width: stacked ? '100%' : undefined }}
+      style={{
+        display: 'flex',
+        flexDirection: stacked ? 'column' : 'row',
+        /* The option labels are `white-space: nowrap` by design, so an unwrapped
+           row cannot shrink below their combined width and overflows the page on
+           narrow phones. Wrapping keeps every option fully tappable without
+           shrinking or truncating the text. */
+        flexWrap: stacked ? 'nowrap' : 'wrap',
+        gap: stacked ? 8 : 0,
+        rowGap: stacked ? 8 : 4,
+        width: stacked ? '100%' : undefined,
+      }}
     >
       {options.map((option) => {
         const selected = option.value === value
@@ -66,7 +77,13 @@ export function Segmented<T extends string>({
               <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <span>{option.label}</span>
                 {option.hint && stacked ? (
-                  <span style={{ fontSize: 11.5, fontWeight: 450, color: selected ? 'rgba(255,255,255,0.75)' : 'var(--color-ves-faint)' }}>
+                  <span
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 450,
+                      color: selected ? 'var(--color-ves-accent-on-tint)' : 'var(--color-ves-faint)',
+                    }}
+                  >
                     {option.hint}
                   </span>
                 ) : null}

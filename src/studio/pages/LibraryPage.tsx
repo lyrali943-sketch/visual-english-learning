@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Library — posters saved on this device (IndexedDB).
  * Tap a poster to reopen it in the editor; delete what you no longer need.
  */
@@ -91,7 +91,11 @@ export function LibraryPage() {
             onClick={() => setThemeFilter('all')}
             style={
               themeFilter === 'all'
-                ? { color: '#fff', borderColor: 'rgba(167,139,250,0.6)', background: 'rgba(139,92,246,0.25)' }
+                ? {
+                    color: 'var(--color-ves-accent-on-tint)',
+                    borderColor: 'var(--color-ves-accent-edge-strong)',
+                    background: 'var(--color-ves-accent-tint-strong)',
+                  }
                 : undefined
             }
           >
@@ -106,7 +110,11 @@ export function LibraryPage() {
               onClick={() => setThemeFilter(theme.id)}
               style={
                 themeFilter === theme.id
-                  ? { color: '#fff', borderColor: 'rgba(167,139,250,0.6)', background: 'rgba(139,92,246,0.25)' }
+                  ? {
+                      color: 'var(--color-ves-accent-on-tint)',
+                      borderColor: 'var(--color-ves-accent-edge-strong)',
+                      background: 'var(--color-ves-accent-tint-strong)',
+                    }
                   : undefined
               }
             >
@@ -117,7 +125,7 @@ export function LibraryPage() {
                   height: 10,
                   borderRadius: 999,
                   background: `linear-gradient(135deg, ${theme.bg} 55%, ${theme.accent} 55%)`,
-                  border: '1px solid rgba(216,204,255,0.35)',
+                  border: '1px solid rgba(16, 35, 74, 0.22)',
                 }}
               />
               {theme.label}
@@ -130,9 +138,9 @@ export function LibraryPage() {
         <div className="ves-glass mt-10 flex flex-col items-center justify-center px-6 py-20 text-center">
           <span
             className="flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: 'rgba(139, 92, 246, 0.14)', border: '1px solid rgba(167, 139, 250, 0.3)' }}
+            style={{ background: 'var(--color-ves-accent-tint)', border: '1px solid var(--color-ves-accent-edge)' }}
           >
-            <BookOpen size={22} strokeWidth={1.8} style={{ color: 'var(--color-ves-violet)' }} />
+            <BookOpen size={22} strokeWidth={1.8} style={{ color: 'var(--color-ves-accent-on-tint)' }} />
           </span>
           <h2 className="mt-5 text-[18px] font-semibold" style={{ color: 'var(--color-ves-text)' }}>
             {libraryRecords.length === 0 ? 'Your library is empty' : 'No posters with that theme'}
@@ -164,7 +172,7 @@ export function LibraryPage() {
                   onClick={() => void open(record)}
                   aria-label={`Open ${record.title}`}
                 >
-                  <div className="relative" style={{ background: 'rgba(11, 7, 23, 0.45)' }}>
+                  <div className="relative" style={{ background: 'var(--color-ves-sunk)' }}>
                     <img
                       src={record.thumbnailDataUrl}
                       alt={`${record.title} poster preview`}
@@ -173,7 +181,7 @@ export function LibraryPage() {
                     {loadingId === record.id ? (
                       <span
                         className="absolute inset-0 flex items-center justify-center"
-                        style={{ background: 'rgba(11, 7, 23, 0.6)' }}
+                        style={{ background: 'var(--color-ves-sunk)' }}
                       >
                         <LoaderCircle size={22} className="ves-spin" style={{ color: 'var(--color-ves-violet)' }} />
                       </span>
@@ -208,7 +216,7 @@ export function LibraryPage() {
                       <button
                         type="button"
                         className="ves-btn ves-btn-sm"
-                        style={{ color: '#FCA5A5', background: 'rgba(248, 113, 113, 0.14)' }}
+                        style={{ color: 'var(--color-ves-danger)', background: 'rgba(192, 52, 44, 0.09)' }}
                         onClick={() => void remove(record)}
                       >
                         <Trash2 size={13} strokeWidth={2} />

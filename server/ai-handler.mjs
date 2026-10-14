@@ -78,42 +78,92 @@ const MAX_SPEAKING_BODY_BYTES = 8 * 1024
 
 const rateBuckets = new Map()
 
+/** Hard ceiling on tracked keys so a burst of distinct IPs cannot grow the map
+ *  without bound inside a single window. */
+const RATE_BUCKET_CAP = 5000
+
 // Stop the map growing without bound on a long-lived server.
 let lastSweep = Date.now()
 function sweepBuckets(now) {
-  if (now - lastSweep < SPEAKING_RATE_LIMIT.windowMs) return
-  lastSweep = now
-  for (const [key, bucket] of rateBuckets) {
-    if (now > bucket.resetAt) rateBuckets.delete(key)
+  if (now - lastSweep >= SPEAKING_RATE_LIMIT.windowMs) {
+    lastSweep = now
+    for (const [key, bucket] of rateBuckets) {
+      if (now > bucket.resetAt) rateBuckets.delete(key)
+    }
+  }
+  // Hard backstop regardless of elapsed time.
+  while (rateBuckets.size > RATE_BUCKET_CAP) {
+    const oldest = rateBuckets.keys().next().value
+    if (oldest === undefined) break
+    rateBuckets.delete(oldest)
   }
 }
 
 /**
- * Resolve the client IP for rate-limiting purposes.
- *
- * We deliberately do NOT trust a client-supplied `X-Forwarded-For` outright:
- * anyone can send that header, and trusting it would let a caller rotate a
- * fake IP per request and bypass the limit entirely. It is only consulted
- * when the server declares itself behind a trusted proxy.
+ * Normalise an address so one client is always counted under one key.
+ * `::ffff:203.0.113.7` and `203.0.113.7` are the same client; without this the
+ * same person could be split across buckets and get 5 requests per alias.
  */
-function clientKey(req) {
-  const remote = req.socket?.remoteAddress ?? ''
-  const trustedProxy = process.env.VES_TRUST_PROXY === 'true'
+function normaliseIp(raw) {
+  let value = String(raw ?? '').trim()
+  if (!value) return ''
 
-  if (trustedProxy) {
-    const forwarded = req.headers['x-forwarded-for']
-    const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded
-    const first = String(raw ?? '').split(',')[0]?.trim()
-    if (first && isPlausibleIp(first)) return first
-    const realIp = req.headers['x-real-ip']
-    if (typeof realIp === 'string' && isPlausibleIp(realIp.trim())) return realIp.trim()
+  // Bracketed IPv6, e.g. "[::1]".
+  if (value.startsWith('[') && value.endsWith(']')) value = value.slice(1, -1)
+
+  const lower = value.toLowerCase()
+
+  // IPv4-mapped / IPv4-compatible IPv6 → plain IPv4.
+  const mapped = lower.match(/^::(?:ffff:)?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/)
+  if (mapped) return mapped[1]
+
+  if (lower.includes(':')) {
+    return /^[0-9a-f:.]+$/.test(lower) && lower.split(':').length >= 3 ? lower : ''
   }
 
-  return isPlausibleIp(remote) ? remote : 'unknown'
+  const parts = lower.split('.')
+  if (parts.length !== 4) return ''
+  for (const part of parts) {
+    if (!/^\d{1,3}$/.test(part)) return ''
+    if (Number(part) > 255) return ''
+  }
+  return parts.join('.')
 }
 
-function isPlausibleIp(value) {
-  return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || value.includes(':')
+/**
+ * Resolve the client IP used as the rate-limit key.
+ *
+ * `X-Forwarded-For` is client-controllable, so it is only consulted when the
+ * deployment explicitly declares itself behind a trusted proxy
+ * (VES_TRUST_PROXY=true).
+ *
+ * Even then we do NOT take the left-most entry. A proxy appends the address it
+ * observed, so a caller sending its own `X-Forwarded-For: 1.2.3.4` produces the
+ * chain "1.2.3.4, <address the proxy actually saw>". Taking [0] would key the
+ * limiter on attacker-controlled data and let the limit be bypassed by rotating
+ * a fake address per request. The right-most entry is the one added by the
+ * nearest trusted hop, and is correct whether the proxy replaces the header
+ * ("<client>") or appends to it ("<spoofed>, <client>").
+ */
+function clientKey(req) {
+  const remote = normaliseIp(req.socket?.remoteAddress ?? '')
+
+  // `trustProxy` is parsed once in server/config.mjs; see that file for why the
+  // default is "ignore X-Forwarded-For".
+  if (getConfig().trustProxy) {
+    const forwarded = req.headers['x-forwarded-for']
+    const chain = (Array.isArray(forwarded) ? forwarded.join(',') : String(forwarded ?? '')).split(',')
+
+    for (let i = chain.length - 1; i >= 0; i -= 1) {
+      const candidate = normaliseIp(chain[i])
+      if (candidate) return candidate
+    }
+
+    const realIp = normaliseIp(req.headers['x-real-ip'])
+    if (realIp) return realIp
+  }
+
+  return remote || 'unknown'
 }
 
 /**
@@ -262,15 +312,12 @@ function readJsonBodyLimited(req, maxBytes) {
   })
 }
 
-async function handleSpeakingAnswer(req, res, config, rate) {
-  if (!rate.allowed) {
-    res.setHeader?.('Retry-After', String(rate.retryAfter))
-    return sendJson(res, 429, {
-      ok: false,
-      error: `Too many requests. The speaking endpoint allows ${SPEAKING_RATE_LIMIT.max} requests per minute; try again in ${rate.retryAfter}s.`,
-    })
-  }
-
+async function handleSpeakingAnswer(req, res, config) {
+  // Input is validated BEFORE the rate limit is charged, so a malformed or
+  // truncated payload from a buggy client returns an honest 400 instead of
+  // silently burning the user's quota and surfacing a misleading 429. Flood
+  // protection still holds: the body read is capped at MAX_SPEAKING_BODY_BYTES,
+  // and any request that reaches the provider is rate limited.
   const body = await readJsonBodyLimited(req, MAX_SPEAKING_BODY_BYTES)
 
   const question = typeof body.question === 'string' ? body.question.trim() : ''
@@ -284,9 +331,15 @@ async function handleSpeakingAnswer(req, res, config, rate) {
     })
   }
 
-  const lengthMode = ['short', 'standard', 'extended'].includes(body.lengthMode)
-    ? body.lengthMode
-    : 'standard'
+  const rate = takeRateLimit(clientKey(req), Date.now())
+  if (!rate.allowed) {
+    res.setHeader?.('Retry-After', String(rate.retryAfter))
+    return sendJson(res, 429, {
+      ok: false,
+      error: `Too many requests. The speaking endpoint allows ${SPEAKING_RATE_LIMIT.max} requests per minute; try again in ${rate.retryAfter}s.`,
+      retryAfter: rate.retryAfter,
+    })
+  }
 
   const toInt = (value, fallback) => {
     const n = Number.parseInt(value, 10)
@@ -298,28 +351,60 @@ async function handleSpeakingAnswer(req, res, config, rate) {
     category: typeof body.category === 'string' ? body.category.slice(0, 60) : '',
     questionType: typeof body.questionType === 'string' ? body.questionType.slice(0, 40) : '',
     difficulty: typeof body.difficulty === 'string' ? body.difficulty.slice(0, 20) : '',
-    lengthMode,
     preparationTime: toInt(body.preparationTime, 15),
     speakingTime: toInt(body.speakingTime, 45),
   })
 
-  const raw = extractJson(
-    await visionChat({ config, messages, maxTokens: 1800, temperature: 0.5 }),
-  )
+  /**
+   * One retry, and only for failures that a second attempt could plausibly
+   * fix: unparsable output, or content that failed validation (wrong shape,
+   * duplicate arguments, off-topic). Transport failures are not retried here
+   * because ai-provider.mjs already owns provider-level retries.
+   */
+  let lastError = null
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    let raw
+    try {
+      const completion = await visionChat({
+        config,
+        messages,
+        maxTokens: 2000,
+        temperature: 0.6,
+      })
+      raw = extractJson(completion)
+    } catch (error) {
+      if (error instanceof ProviderError && error.status === 502) {
+        // Empty / malformed provider response — worth one more try.
+        lastError = error.message
+        if (attempt === 1) continue
+        break
+      }
+      throw error
+    }
 
-  const validated = validateSpeakingAnswer(raw, { question, lengthMode })
-  if (!validated.ok) {
-    return sendJson(res, 502, {
-      ok: false,
-      error: `The AI returned unusable speaking content: ${validated.error}`,
-      detail: 'Try generating again, or use the built-in template.',
-      source: 'speaking',
-    })
+    const validated = validateSpeakingAnswer(raw, { question })
+    if (validated.ok) {
+      return sendJson(res, 200, {
+        ok: true,
+        data: {
+          ...validated.data,
+          source: 'ai',
+          attempts: attempt,
+        },
+      })
+    }
+
+    lastError = validated.error
+    if (attempt === 1) continue
   }
 
-  return sendJson(res, 200, {
-    ok: true,
-    data: { ...validated.data, source: 'ai', lengthMode },
+  return sendJson(res, 502, {
+    ok: false,
+    error: `The AI could not produce a usable answer plan for this question: ${lastError ?? 'unknown error'}`,
+    detail:
+      'It was attempted twice. You can try again, or continue with the built-in template, which is clearly marked as a template.',
+    source: 'speaking',
+    attempts: 2,
   })
 }
 
@@ -351,13 +436,12 @@ export function createAiApiMiddleware() {
         return sendJson(res, 405, { ok: false, error: 'Use POST for this endpoint.' })
       }
 
-      // Rate limiting runs before the provider check so an unconfigured
-      // deployment cannot be used to probe, and a configured one cannot be
-      // hammered. Scoped to /api/speaking-answer only.
+      // Scoped to /api/speaking-answer only. The rate limit is charged inside
+      // the handler, after input validation, so malformed requests get an
+      // honest 400 rather than consuming the caller's quota.
       if (url.pathname === '/api/speaking-answer') {
-        const rate = takeRateLimit(clientKey(req), Date.now())
         if (checkConfigured(config, res)) return
-        return await handleSpeakingAnswer(req, res, config, rate)
+        return await handleSpeakingAnswer(req, res, config)
       }
 
       if (checkConfigured(config, res)) return

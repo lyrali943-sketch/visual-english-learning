@@ -63,11 +63,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#08090D] text-white">
       <Background />
+      {/* The Speaking Arena uses a light, blue-white theme. Only that page opts
+          in; Home / Topic Lab / Progress / Settings keep the original dark bar. */}
       <Navbar
         currentPage={currentPage}
         onNavigate={handleNavigate}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
+        tone={currentPage === 'arena' ? 'light' : 'dark'}
       />
 
       <main className="relative z-10">

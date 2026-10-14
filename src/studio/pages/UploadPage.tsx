@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Upload — real photo intake with drag & drop, camera capture, validation,
  * preview and the learning mode / difficulty choices.
  */
@@ -90,7 +90,7 @@ export function UploadPage() {
         {photo ? (
           <div className="ves-glass overflow-hidden">
             <div className="grid gap-0 sm:grid-cols-[1.15fr_0.85fr]">
-              <div className="relative flex items-center justify-center p-4" style={{ background: 'rgba(11, 7, 23, 0.45)' }}>
+              <div className="relative flex items-center justify-center p-4" style={{ background: 'var(--color-ves-sunk)' }}>
                 <img
                   src={photo.previewDataUrl}
                   alt="Your uploaded photo"
@@ -168,9 +168,9 @@ export function UploadPage() {
             <span
               className="flex h-16 w-16 items-center justify-center rounded-3xl"
               style={{
-                background: 'linear-gradient(135deg, rgba(139,92,246,0.9), rgba(109,93,251,0.9))',
+                background: 'var(--color-ves-accent-fill)',
                 color: '#fff',
-                boxShadow: '0 16px 40px -12px rgba(139, 92, 246, 0.85)',
+                boxShadow: '0 14px 34px -14px rgba(47, 95, 224, 0.8)',
               }}
             >
               <ImagePlus size={26} strokeWidth={1.8} />
@@ -207,13 +207,13 @@ export function UploadPage() {
           className="mt-4 flex items-start gap-3 rounded-2xl p-4"
           role="alert"
           style={{
-            background: 'rgba(248, 113, 113, 0.1)',
-            border: '1px solid rgba(248, 113, 113, 0.35)',
+            background: 'rgba(192, 52, 44, 0.07)',
+            border: '1px solid rgba(192, 52, 44, 0.28)',
           }}
         >
           <CircleAlert size={18} strokeWidth={2} style={{ color: 'var(--color-ves-danger)', flex: 'none', marginTop: 1 }} />
           <div>
-            <p className="text-[14px] font-semibold" style={{ color: '#FCA5A5' }}>
+            <p className="text-[14px] font-semibold" style={{ color: 'var(--color-ves-danger)' }}>
               {error.message}
             </p>
             {error.hint ? (

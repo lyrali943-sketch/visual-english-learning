@@ -68,10 +68,25 @@ const server = createServer((req, res) => {
 server.listen(config.port, () => {
   // eslint-disable-next-line no-console
   console.log(`[ves-server] Visual English Studio → http://localhost:${config.port}`)
+  // Never logs the API key — only the provider label and model id.
   // eslint-disable-next-line no-console
   console.log(
     config.configured
       ? `[ves-server] AI provider: ${config.provider} (${config.model})`
       : '[ves-server] No AI provider configured — running in demo mode. See .env.example.',
   )
+  // Rate-limit accuracy depends on how the client IP is derived. Behind a proxy
+  // (Render, nginx, …) every request arrives from the proxy's address, so all
+  // users would share one quota. This prints a single hint at startup — no IP
+  // addresses are logged, and nothing is logged per request.
+  if (config.trustProxy) {
+    // eslint-disable-next-line no-console
+    console.log('[ves-server] VES_TRUST_PROXY=true — client IPs taken from the right-most X-Forwarded-For entry.')
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(
+      '[ves-server] VES_TRUST_PROXY not set — rate limiting keys on the direct peer address. ' +
+        'Set it to true when deploying behind a proxy (e.g. Render).',
+    )
+  }
 })

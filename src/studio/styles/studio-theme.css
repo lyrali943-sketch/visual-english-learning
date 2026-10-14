@@ -1,5 +1,11 @@
 /* ==========================================================================
-   Visual English Studio — site design system (Premium iOS / dark violet)
+   Visual English Studio — site design system (light ice-blue workspace)
+
+   Everything visual for the Studio routes flows through the tokens in the
+   @theme block below. Switching the product from deep violet to a blue-white
+   workspace is therefore a token change, not a page-by-page rewrite, and every
+   page inherits the new surface consistently.
+
    Self-hosted fonts only. No external font links are required.
    ========================================================================== */
 
@@ -27,25 +33,42 @@
 }
 
 @theme {
-  /* Surfaces */
-  --color-ves-bg: #0b0717;
-  --color-ves-surface: #151027;
-  --color-ves-elevated: #21183a;
-  --color-ves-purple: #8b5cf6;
-  --color-ves-violet: #a78bfa;
-  --color-ves-lavender: #d8ccff;
+  /* Surfaces — white / ice, darkest only for wells and photo backdrops */
+  --color-ves-bg: #f3f7fd;
+  --color-ves-surface: #ffffff;
+  --color-ves-elevated: #ffffff;
+  --color-ves-sunk: #eaf0f9;
 
-  /* Text */
-  --color-ves-text: #f7f5ff;
-  --color-ves-muted: #b6aec9;
-  --color-ves-faint: #8b83a3;
+  /* Accent — blue into blue-violet, used for primary actions and focus only */
+  --color-ves-purple: #2f5fe0;
+  --color-ves-violet: #4f46c9;
+  --color-ves-lavender: #5b52d8;
+
+  /* Text — deep grey-blue, never pure black */
+  --color-ves-text: #0d1830;
+  --color-ves-muted: #45577a;
+  --color-ves-faint: #5f7189;
 
   /* Lines & glows */
-  --color-ves-line: rgba(216, 204, 255, 0.14);
-  --color-ves-line-strong: rgba(216, 204, 255, 0.3);
-  --color-ves-glow: rgba(139, 92, 246, 0.45);
-  --color-ves-danger: #f87171;
-  --color-ves-success: #6ee7b7;
+  --color-ves-line: rgba(16, 35, 74, 0.09);
+  --color-ves-line-strong: rgba(16, 35, 74, 0.16);
+  --color-ves-glow: rgba(47, 95, 224, 0.28);
+  --color-ves-danger: #c0342c;
+  --color-ves-success: #147a52;
+
+  /* Accent ramp — used by inline styles in the pages so that no component
+     has to hard-code a violet-on-dark value that no longer exists. */
+  --color-ves-accent-tint: rgba(47, 95, 224, 0.09);
+  --color-ves-accent-tint-strong: rgba(47, 95, 224, 0.16);
+  --color-ves-accent-edge: rgba(47, 95, 224, 0.3);
+  --color-ves-accent-edge-strong: rgba(47, 95, 224, 0.5);
+  --color-ves-accent-on-tint: #2350c8;
+  --color-ves-accent-fill: linear-gradient(135deg, #2f5fe0 0%, #4f46c9 100%);
+  --color-ves-well: rgba(234, 240, 249, 0.9);
+  --color-ves-shadow-soft: 0 10px 26px -14px rgba(16, 35, 74, 0.3);
+
+  /* Poster-specific — the printed poster stays on its own warm paper palette */
+  --color-ves-poster-bg: #f7f2e9;
 
   /* Fonts */
   --font-ves-sans:
@@ -63,6 +86,35 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* index.css sets a global `:focus-visible` ring in the Speaking violet.
+     Scoped to `.ves-app` so the Studio focuses in its own accent while the
+     speaking app keeps the ring it was designed with. */
+  .ves-app :focus-visible {
+    outline: 2px solid var(--color-ves-purple);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Studio-scoped scrollbar. The global rule in index.css is left untouched so
+     the speaking app keeps its own dark chrome. */
+  .ves-app ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .ves-app ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .ves-app ::-webkit-scrollbar-thumb {
+    background: rgba(16, 35, 74, 0.16);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  .ves-app ::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 35, 74, 0.28);
+    background-clip: content-box;
+  }
 }
 
 @layer components {
@@ -72,21 +124,24 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    overflow: hidden;
+    overflow: hidden; /* also clips the decorative orbs, so they cannot widen the page */
     background:
-      radial-gradient(120% 80% at 50% -10%, rgba(139, 92, 246, 0.16), transparent 60%),
-      radial-gradient(90% 60% at 85% 10%, rgba(109, 93, 251, 0.1), transparent 55%),
-      linear-gradient(180deg, #0b0717 0%, #0d0919 45%, #0b0717 100%);
+      radial-gradient(120% 78% at 50% -14%, rgba(96, 165, 250, 0.13), transparent 62%),
+      radial-gradient(90% 60% at 88% 8%, rgba(129, 140, 248, 0.1), transparent 58%),
+      radial-gradient(80% 55% at 6% 42%, rgba(14, 165, 233, 0.07), transparent 60%),
+      linear-gradient(180deg, #fbfdff 0%, #f2f6fc 48%, #edf2fa 100%);
   }
   .ves-ambient::after {
     /* extremely subtle spatial texture */
     content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.5;
-    background-image: radial-gradient(rgba(216, 204, 255, 0.05) 1px, transparent 1px);
+    opacity: 0.85;
+    background-image: linear-gradient(rgba(16, 35, 74, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 35, 74, 0.028) 1px, transparent 1px);
     background-size: 28px 28px;
     mask-image: radial-gradient(80% 60% at 50% 0%, black, transparent 75%);
+    -webkit-mask-image: radial-gradient(80% 60% at 50% 0%, black, transparent 75%);
   }
   .ves-orb {
     position: absolute;
@@ -101,7 +156,7 @@
     min-height: 320px;
     top: -12vw;
     left: -8vw;
-    background: radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.34), transparent 65%);
+    background: radial-gradient(circle at 40% 40%, rgba(96, 165, 250, 0.22), transparent 65%);
   }
   .ves-orb-b {
     width: 38vw;
@@ -110,7 +165,7 @@
     min-height: 260px;
     top: 22vh;
     right: -10vw;
-    background: radial-gradient(circle at 60% 40%, rgba(167, 139, 250, 0.2), transparent 65%);
+    background: radial-gradient(circle at 60% 40%, rgba(129, 140, 248, 0.16), transparent 65%);
   }
   .ves-orb-c {
     width: 42vw;
@@ -119,26 +174,26 @@
     min-height: 280px;
     bottom: -18vh;
     left: 28vw;
-    background: radial-gradient(circle at 50% 50%, rgba(109, 93, 251, 0.16), transparent 65%);
+    background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.12), transparent 65%);
   }
 
   /* --- Glass ------------------------------------------------------------ */
   .ves-glass {
-    background: linear-gradient(180deg, rgba(33, 24, 58, 0.72), rgba(21, 16, 39, 0.78));
+    background: rgba(255, 255, 255, 0.82);
     border: 1px solid var(--color-ves-line);
     border-radius: 24px;
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
     box-shadow:
-      0 1px 0 rgba(247, 245, 255, 0.05) inset,
-      0 24px 60px -32px rgba(5, 2, 15, 0.9);
+      0 1px 0 rgba(255, 255, 255, 0.9) inset,
+      0 18px 40px -28px rgba(16, 35, 74, 0.34);
   }
   .ves-glass-soft {
-    background: rgba(21, 16, 39, 0.55);
+    background: rgba(255, 255, 255, 0.66);
     border: 1px solid var(--color-ves-line);
     border-radius: 20px;
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
   }
 
   /* --- Buttons ---------------------------------------------------------- */
@@ -157,40 +212,52 @@
     user-select: none;
     text-decoration: none;
     transition:
-      transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
-      filter 0.18s ease,
-      background-color 0.18s ease,
-      border-color 0.18s ease,
-      box-shadow 0.18s ease;
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .ves-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
   .ves-btn:disabled {
-    opacity: 0.45;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
+    filter: grayscale(0.4);
+  }
+  .ves-btn:focus-visible {
+    outline: 2px solid var(--color-ves-purple);
+    outline-offset: 2px;
   }
   .ves-btn-primary {
     color: #fff;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d5dfb 55%, #7c5cf6 100%);
+    background: linear-gradient(135deg, #2f5fe0 0%, #4f46c9 60%, #5b52d8 100%);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.18) inset,
-      0 10px 30px -8px rgba(139, 92, 246, 0.55);
+      0 1px 0 rgba(255, 255, 255, 0.22) inset,
+      0 10px 26px -10px rgba(47, 95, 224, 0.5);
   }
   .ves-btn-primary:hover:not(:disabled) {
-    filter: brightness(1.08);
+    background: linear-gradient(135deg, #2650c9 0%, #443ab5 60%, #4f46c9 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.22) inset,
+      0 14px 30px -10px rgba(47, 95, 224, 0.6);
+    transform: translateY(-1px);
   }
   .ves-btn-glass {
     color: var(--color-ves-text);
-    background: rgba(33, 24, 58, 0.6);
-    border-color: var(--color-ves-line);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-ves-line-strong);
+    box-shadow: 0 1px 2px rgba(16, 35, 74, 0.05);
   }
   .ves-btn-glass:hover:not(:disabled) {
-    background: rgba(43, 32, 74, 0.75);
-    border-color: var(--color-ves-line-strong);
+    background: #fff;
+    border-color: rgba(47, 95, 224, 0.4);
+    color: var(--color-ves-purple);
+    box-shadow: 0 8px 20px -12px rgba(16, 35, 74, 0.3);
+    transform: translateY(-1px);
   }
   .ves-btn-ghost {
     color: var(--color-ves-muted);
@@ -198,7 +265,7 @@
   }
   .ves-btn-ghost:hover:not(:disabled) {
     color: var(--color-ves-text);
-    background: rgba(216, 204, 255, 0.07);
+    background: rgba(16, 35, 74, 0.05);
   }
   .ves-btn-sm {
     padding: 9px 14px;
@@ -219,7 +286,7 @@
     padding: 5px 11px;
     border-radius: 999px;
     border: 1px solid var(--color-ves-line);
-    background: rgba(216, 204, 255, 0.06);
+    background: rgba(255, 255, 255, 0.78);
     color: var(--color-ves-muted);
     font-size: 12px;
     font-weight: 550;
@@ -227,9 +294,9 @@
     white-space: nowrap;
   }
   .ves-chip-accent {
-    color: var(--color-ves-lavender);
-    border-color: rgba(167, 139, 250, 0.4);
-    background: rgba(139, 92, 246, 0.16);
+    color: var(--color-ves-purple);
+    border-color: rgba(47, 95, 224, 0.24);
+    background: rgba(47, 95, 224, 0.08);
   }
 
   /* --- Segmented control ------------------------------------------------ */
@@ -240,7 +307,7 @@
     gap: 2px;
     border-radius: 14px;
     border: 1px solid var(--color-ves-line);
-    background: rgba(11, 7, 23, 0.55);
+    background: rgba(234, 240, 249, 0.9);
   }
   .ves-segment-item {
     position: relative;
@@ -257,22 +324,24 @@
     cursor: pointer;
     border: none;
     background: transparent;
-    transition: color 0.18s ease;
+    transition: color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     white-space: nowrap;
   }
   .ves-segment-item[aria-selected='true'] {
-    color: #fff;
+    color: var(--color-ves-purple);
   }
   .ves-segment-thumb {
     position: absolute;
     z-index: 0;
     inset-block: 4px;
     border-radius: 10px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(109, 93, 251, 0.95));
-    box-shadow: 0 4px 14px -4px rgba(139, 92, 246, 0.7);
+    background: #fff;
+    box-shadow:
+      0 1px 2px rgba(16, 35, 74, 0.08),
+      0 4px 12px -6px rgba(16, 35, 74, 0.24);
   }
   .ves-segment-item:focus-visible {
-    outline: 2px solid var(--color-ves-violet);
+    outline: 2px solid var(--color-ves-purple);
     outline-offset: 1px;
   }
 
@@ -281,8 +350,8 @@
   .ves-textarea,
   .ves-select {
     width: 100%;
-    background: rgba(11, 7, 23, 0.55);
-    border: 1px solid var(--color-ves-line);
+    background: #fff;
+    border: 1px solid var(--color-ves-line-strong);
     border-radius: 12px;
     color: var(--color-ves-text);
     font: inherit;
@@ -305,8 +374,8 @@
   .ves-textarea:focus,
   .ves-select:focus {
     outline: none;
-    border-color: rgba(167, 139, 250, 0.65);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.22);
+    border-color: rgba(47, 95, 224, 0.6);
+    box-shadow: 0 0 0 3px rgba(47, 95, 224, 0.14);
   }
   .ves-label {
     display: block;
@@ -330,7 +399,7 @@
   .ves-range::-webkit-slider-runnable-track {
     height: 5px;
     border-radius: 999px;
-    background: rgba(216, 204, 255, 0.16);
+    background: rgba(16, 35, 74, 0.12);
   }
   .ves-range::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -341,12 +410,12 @@
     border-radius: 999px;
     background: #fff;
     border: 4px solid var(--color-ves-purple);
-    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
+    box-shadow: 0 2px 8px rgba(47, 95, 224, 0.35);
   }
   .ves-range::-moz-range-track {
     height: 5px;
     border-radius: 999px;
-    background: rgba(216, 204, 255, 0.16);
+    background: rgba(16, 35, 74, 0.12);
   }
   .ves-range::-moz-range-thumb {
     width: 12px;
@@ -373,7 +442,7 @@
     color: var(--color-ves-muted);
   }
   .ves-link {
-    color: var(--color-ves-violet);
+    color: var(--color-ves-purple);
     text-decoration: none;
     border-radius: 6px;
   }
@@ -386,24 +455,40 @@
   .ves-dropzone {
     position: relative;
     border-radius: 24px;
-    border: 1.5px dashed var(--color-ves-line-strong);
+    border: 1.5px dashed rgba(16, 35, 74, 0.2);
     background:
-      radial-gradient(90% 90% at 50% 0%, rgba(139, 92, 246, 0.09), transparent 65%),
-      rgba(21, 16, 39, 0.5);
+      radial-gradient(90% 90% at 50% 0%, rgba(96, 165, 250, 0.12), transparent 65%),
+      rgba(255, 255, 255, 0.7);
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease,
-      transform 0.2s ease;
+      box-shadow 0.2s ease;
   }
   .ves-dropzone:hover {
-    border-color: rgba(167, 139, 250, 0.55);
+    border-color: rgba(47, 95, 224, 0.5);
+    background:
+      radial-gradient(90% 90% at 50% 0%, rgba(96, 165, 250, 0.18), transparent 65%),
+      #fff;
   }
   .ves-dropzone[data-dragging='true'] {
-    border-color: var(--color-ves-violet);
+    border-color: var(--color-ves-purple);
+    border-style: solid;
     background:
-      radial-gradient(90% 90% at 50% 0%, rgba(139, 92, 246, 0.2), transparent 70%),
-      rgba(33, 24, 58, 0.7);
-    transform: scale(1.005);
+      radial-gradient(90% 90% at 50% 0%, rgba(96, 165, 250, 0.26), transparent 68%),
+      #fff;
+    box-shadow: 0 0 0 4px rgba(47, 95, 224, 0.12);
+  }
+  .ves-dropzone:focus-visible {
+    outline: 2px solid var(--color-ves-purple);
+    outline-offset: 3px;
+  }
+
+  /* --- Photo well ------------------------------------------------------- */
+  /* Photos sit on a dark neutral so light and dark images both read correctly,
+     while the surrounding workspace stays light. */
+  .ves-photo-well {
+    background: linear-gradient(180deg, #eef2f8, #e2e8f2);
+    border: 1px solid var(--color-ves-line);
   }
 
   /* --- Paper stage (poster workspace) ----------------------------------- */
@@ -411,26 +496,26 @@
     position: relative;
     border-radius: 20px;
     background:
-      radial-gradient(75% 55% at 50% 42%, rgba(139, 92, 246, 0.16), transparent 70%),
-      linear-gradient(180deg, rgba(11, 7, 23, 0.35), rgba(11, 7, 23, 0.6));
+      radial-gradient(75% 55% at 50% 42%, rgba(96, 165, 250, 0.14), transparent 70%),
+      linear-gradient(180deg, #f4f7fc, #eaf0f8);
     border: 1px solid var(--color-ves-line);
   }
   .ves-paper-shadow {
-    filter: drop-shadow(0 30px 60px rgba(5, 2, 15, 0.65)) drop-shadow(0 4px 14px rgba(139, 92, 246, 0.18));
+    filter: drop-shadow(0 26px 50px rgba(16, 35, 74, 0.22)) drop-shadow(0 4px 12px rgba(16, 35, 74, 0.12));
   }
 }
 
 @layer utilities {
   .ves-scrollarea {
     scrollbar-width: thin;
-    scrollbar-color: rgba(216, 204, 255, 0.22) transparent;
+    scrollbar-color: rgba(16, 35, 74, 0.2) transparent;
   }
   .ves-scrollarea::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   .ves-scrollarea::-webkit-scrollbar-thumb {
-    background: rgba(216, 204, 255, 0.18);
+    background: rgba(16, 35, 74, 0.18);
     border-radius: 999px;
   }
   .ves-scrollarea::-webkit-scrollbar-track {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Analysis — the real, staged pipeline with honest progress feedback.
  * No fake percentages: each label corresponds to an actual stage of the
  * pipeline (image → identification → content → layout).
@@ -34,9 +34,15 @@ export function AnalysisPage() {
     }
     if (startedRef.current) return
     startedRef.current = true
-    void runAnalysis().then(() => {
-      if (window.location.pathname === '/analyze') navigate('/editor')
-    })
+    /* `runAnalysis` rejects on failure, but the failure is already rendered by
+       the `analysis.status === 'error'` panel below. Without this catch every
+       failed run also logged "Uncaught (in promise) AiServiceError", duplicating
+       an error the user can already see and act on. */
+    void runAnalysis()
+      .then(() => {
+        if (window.location.pathname === '/analyze') navigate('/editor')
+      })
+      .catch(() => undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -74,7 +80,7 @@ export function AnalysisPage() {
       {/* Photo with a restrained scanning highlight */}
       {photo ? (
         <div className="ves-glass relative mt-8 overflow-hidden p-3">
-          <div className="relative overflow-hidden rounded-2xl" style={{ background: 'rgba(11, 7, 23, 0.5)' }}>
+          <div className="ves-photo-well relative overflow-hidden rounded-2xl">
             <img
               src={photo.previewDataUrl}
               alt="The photo being analysed"
@@ -90,8 +96,8 @@ export function AnalysisPage() {
                   right: 0,
                   height: 120,
                   background:
-                    'linear-gradient(180deg, transparent, rgba(167, 139, 250, 0.22) 55%, rgba(216, 204, 255, 0.5) 92%, transparent)',
-                  borderBottom: '1.5px solid rgba(216, 204, 255, 0.65)',
+                    'linear-gradient(180deg, transparent, rgba(47, 95, 224, 0.16) 55%, rgba(96, 165, 250, 0.42) 92%, transparent)',
+                  borderBottom: '1.5px solid rgba(96, 165, 250, 0.85)',
                 }}
               />
             ) : null}
@@ -124,9 +130,10 @@ export function AnalysisPage() {
               key={step.id}
               className="flex items-center gap-4 rounded-2xl px-5 py-4"
               style={{
-                background: isActive ? 'rgba(139, 92, 246, 0.12)' : 'rgba(21, 16, 39, 0.5)',
-                border: `1px solid ${isActive ? 'rgba(167, 139, 250, 0.45)' : 'var(--color-ves-line)'}`,
-                opacity: isActive || isDone || isFailed ? 1 : 0.55,
+                background: isActive ? 'var(--color-ves-accent-tint)' : 'rgba(255, 255, 255, 0.7)',
+                border: `1px solid ${isActive ? 'var(--color-ves-accent-edge-strong)' : 'var(--color-ves-line)'}`,
+                boxShadow: isActive ? 'var(--color-ves-shadow-soft)' : 'none',
+                opacity: isActive || isDone || isFailed ? 1 : 0.62,
                 transition: 'opacity 0.3s ease, background 0.3s ease, border-color 0.3s ease',
               }}
             >
@@ -134,12 +141,12 @@ export function AnalysisPage() {
                 className="flex h-9 w-9 flex-none items-center justify-center rounded-full"
                 style={{
                   background: isDone
-                    ? 'rgba(110, 231, 183, 0.16)'
+                    ? 'rgba(20, 122, 82, 0.12)'
                     : isActive
-                      ? 'linear-gradient(135deg, rgba(139,92,246,0.95), rgba(109,93,251,0.95))'
-                      : 'rgba(216, 204, 255, 0.08)',
+                      ? 'var(--color-ves-accent-fill)'
+                      : 'rgba(255, 255, 255, 0.8)',
                   color: isDone ? 'var(--color-ves-success)' : '#fff',
-                  border: isDone || isActive ? 'none' : '1px solid var(--color-ves-line)',
+                  border: isDone || isActive ? 'none' : '1px solid var(--color-ves-line-strong)',
                 }}
               >
                 {isDone ? (
@@ -155,7 +162,7 @@ export function AnalysisPage() {
               <span className="flex-1">
                 <span
                   className="block text-[15px] font-semibold"
-                  style={{ color: isFailed ? '#FCA5A5' : 'var(--color-ves-text)' }}
+                  style={{ color: isFailed ? 'var(--color-ves-danger)' : 'var(--color-ves-text)' }}
                 >
                   {isFailed && analysis.error ? analysis.error : step.label}
                 </span>
@@ -173,13 +180,13 @@ export function AnalysisPage() {
         <div
           className="mt-6 flex items-start gap-3 rounded-2xl p-4"
           style={{
-            background: 'rgba(139, 92, 246, 0.1)',
-            border: '1px solid rgba(167, 139, 250, 0.3)',
+            background: 'var(--color-ves-accent-tint)',
+            border: '1px solid var(--color-ves-accent-edge)',
           }}
         >
-          <Sparkles size={17} strokeWidth={2} style={{ color: 'var(--color-ves-violet)', flex: 'none', marginTop: 1 }} />
+          <Sparkles size={17} strokeWidth={2} style={{ color: 'var(--color-ves-accent-on-tint)', flex: 'none', marginTop: 1 }} />
           <p className="text-[13px] leading-relaxed" style={{ color: 'var(--color-ves-muted)' }}>
-            <strong style={{ color: 'var(--color-ves-lavender)' }}>Demo mode.</strong> No AI provider is configured, so the
+            <strong style={{ color: 'var(--color-ves-accent-on-tint)' }}>Demo mode.</strong> No AI provider is configured, so the
             steps above run against a fixed sample (a yogurt-bowl lesson) instead of a real analysis of your photo. The
             poster is marked “Demo sample”. Configure an AI provider in <code>.env</code> to analyse your own photos.
           </p>
@@ -192,12 +199,12 @@ export function AnalysisPage() {
           {...(reducedMotion ? {} : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } })}
           className="mt-6 rounded-2xl p-5"
           role="alert"
-          style={{ background: 'rgba(248, 113, 113, 0.09)', border: '1px solid rgba(248, 113, 113, 0.35)' }}
+          style={{ background: 'rgba(192, 52, 44, 0.07)', border: '1px solid rgba(192, 52, 44, 0.28)' }}
         >
           <div className="flex items-start gap-3">
             <CircleAlert size={19} strokeWidth={2} style={{ color: 'var(--color-ves-danger)', flex: 'none', marginTop: 1 }} />
             <div className="flex-1">
-              <p className="text-[15px] font-semibold" style={{ color: '#FCA5A5' }}>
+              <p className="text-[15px] font-semibold" style={{ color: 'var(--color-ves-danger)' }}>
                 The poster could not be created.
               </p>
               <p className="mt-1 text-[13.5px] leading-relaxed" style={{ color: 'var(--color-ves-muted)' }}>
@@ -216,7 +223,15 @@ export function AnalysisPage() {
               Try again
             </button>
             {!demoMode ? (
-              <button type="button" className="ves-btn ves-btn-glass ves-btn-sm" onClick={() => void continueWithSample()}>
+              <button
+                type="button"
+                className="ves-btn ves-btn-glass ves-btn-sm"
+                /* Recovery must land somewhere. This button is only reachable
+                   after the mount effect has already run, so the `navigate`
+                   in that effect will not fire again — without this the sample
+                   analysis completes and the user is stranded on /analyze. */
+                onClick={() => void continueWithSample().then(() => navigate('/editor'))}
+              >
                 <Sparkles size={15} strokeWidth={2} />
                 Continue with sample content
               </button>

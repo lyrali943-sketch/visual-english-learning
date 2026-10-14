@@ -9,6 +9,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CircleAlert, CircleCheck } from 'lucide-react'
 
 import { RouterProvider, StudioLink, useRouter } from './router'
+import { isStandaloneRoute } from './routeMatch'
 import { SessionProvider, useSession } from './session/SessionProvider'
 import { AmbientBackground } from './components/AmbientBackground'
 import { SiteHeader } from './components/SiteHeader'
@@ -18,14 +19,24 @@ import { AnalysisPage } from './pages/AnalysisPage'
 import { EditorPage } from './pages/EditorPage'
 import { LibraryPage } from './pages/LibraryPage'
 
-// The previous app in this project (NEON SPEAK speaking practice) is kept
-// intact and remains available at /speaking.
+// The two other products in this repository. Both render their own shell, so
+// neither inherits the Studio's chrome; see StandaloneProduct below.
 import LegacySpeakingApp from '../App'
+import { StartPage } from '../start/StartPage'
+
+/**
+ * The two products that are not the Studio.
+ *
+ * Speaking Practice keeps its own navigation, palette and fonts; the interactive
+ * design prototype does the same. Neither is mounted inside `.ves-app`, so the
+ * Studio's site header, site footer and background can never leak onto them.
+ */
+function StandaloneProduct({ name }: { name: 'speaking' | 'start' }) {
+  return name === 'speaking' ? <LegacySpeakingApp /> : <StartPage />
+}
 
 function StudioRoutes() {
   const { route, navigate } = useRouter()
-
-  if (route.name === 'speaking') return <LegacySpeakingApp />
 
   if (route.name === 'notfound') {
     return (
@@ -41,6 +52,8 @@ function StudioRoutes() {
     )
   }
 
+  // Studio routes only. `speaking` and `start` never reach this component —
+  // StudioEntry returns StandaloneProduct for them first.
   return (
     <>
       {route.name === 'home' ? <HomePage /> : null}
@@ -53,12 +66,13 @@ function StudioRoutes() {
 }
 
 function SiteFooter() {
-  const { path } = useRouter()
-  if (path === '/speaking') return null
+  // Only rendered on Studio routes: StudioEntry returns StandaloneProduct for
+  // /speaking and /start before this component is ever mounted, so it needs no
+  // path check of its own.
   return (
     <footer
       className="relative z-10 mt-10 border-t"
-      style={{ borderColor: 'var(--color-ves-line)', background: 'rgba(11, 7, 23, 0.6)' }}
+      style={{ borderColor: 'var(--color-ves-line)', background: 'rgba(255, 255, 255, 0.72)' }}
     >
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-5 py-10 sm:px-8 md:flex-row md:items-center md:justify-between">
         <div>
@@ -70,18 +84,23 @@ function SiteFooter() {
             nothing is uploaded or synced.
           </p>
         </div>
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]">
-          <StudioLink to="/" className="ves-link">
+        {/* `py-1.5` + `gap-y-0` keeps the visual rhythm while giving each link a
+            ~32px tap target (WCAG 2.5.8) instead of a 20px line box. */}
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-0 text-[13px]">
+          <StudioLink to="/" className="ves-link py-1.5">
             Home
           </StudioLink>
-          <StudioLink to="/upload" className="ves-link">
+          <StudioLink to="/start" className="ves-link py-1.5">
+            Overview
+          </StudioLink>
+          <StudioLink to="/upload" className="ves-link py-1.5">
             Create a Poster
           </StudioLink>
-          <StudioLink to="/library" className="ves-link">
+          <StudioLink to="/library" className="ves-link py-1.5">
             My Library
           </StudioLink>
-          <StudioLink to="/speaking" className="ves-link" style={{ color: 'var(--color-ves-faint)' }}>
-            Speaking practice (legacy)
+          <StudioLink to="/speaking" className="ves-link py-1.5" style={{ color: 'var(--color-ves-faint)' }}>
+            Speaking Practice
           </StudioLink>
         </nav>
       </div>
@@ -114,12 +133,12 @@ function NoticeToast() {
           <span
             className="pointer-events-auto flex items-center gap-2.5 rounded-2xl px-4 py-3 text-[13.5px] font-medium"
             style={{
-              background: 'linear-gradient(180deg, rgba(33, 24, 58, 0.92), rgba(21, 16, 39, 0.94))',
-              border: '1px solid rgba(167, 139, 250, 0.4)',
+              background: 'rgba(255, 255, 255, 0.94)',
+              border: '1px solid var(--color-ves-line-strong)',
               color: 'var(--color-ves-text)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
-              boxShadow: '0 18px 50px -18px rgba(5, 2, 15, 0.95)',
+              boxShadow: '0 18px 44px -20px rgba(16, 35, 74, 0.5)',
             }}
           >
             {notice.toLowerCase().includes('delet') ? (
@@ -136,18 +155,21 @@ function NoticeToast() {
 }
 
 /**
- * Picks between the Studio site chrome and the standalone legacy speaking app.
+ * Chooses the shell: the Studio's own chrome, or a standalone product.
  *
- * It has to live *inside* <RouterProvider> because it reads the current route,
- * and it must not call any hook conditionally.
+ * It must live *inside* <RouterProvider> because it reads the current route,
+ * and it must not call a hook conditionally.
+ *
+ * The check is on `route.name`, not `window.location.pathname`. matchRoute()
+ * normalises trailing slashes, so "/speaking/" resolves to the same route as
+ * "/speaking"; testing the raw string used to let the trailing-slash form fall
+ * through to the Studio shell, which rendered Speaking (and the design
+ * prototype) inside the Studio's header, footer and dark violet background.
  */
 function StudioEntry() {
-  const { path } = useRouter()
+  const { route } = useRouter()
 
-  // NEON SPEAK renders on its own: no SiteHeader, SiteFooter, AmbientBackground
-  // or .ves-app surface, so it keeps its original dark layout and typography
-  // instead of inheriting the Studio's fonts, colours and background.
-  if (path === '/speaking') return <LegacySpeakingApp />
+  if (isStandaloneRoute(route.name)) return <StandaloneProduct name={route.name} />
 
   return (
     <div className="ves-app relative min-h-screen" style={{ display: 'flex', flexDirection: 'column' }}>

@@ -1,0 +1,1465 @@
+/* ==========================================================================
+ * Product landing page — visual layer only.
+ *
+ * Scoped end to end: every rule is prefixed `.ldg-` and the page renders on its
+ * own, outside the Visual English Studio shell (`.ves-*`) and outside the
+ * speaking app (`.spk-*`). Nothing here targets html / body / button / a, so
+ * neither of those modules is affected.
+ *
+ * Contents
+ *   1. Tokens (colour, motion, radii, elevation)
+ *   2. Backdrop and light field
+ *   3. Typography and layout primitives
+ *   4. Buttons, chips, badges
+ *   5. Navigation
+ *   6. Hero + concept chain
+ *   7. Act two — isolated vs contextual
+ *   8. Act three — studio demo
+ *   9. Act four — speaking demo
+ *   10. Act five — planned modules + closing CTA
+ *   11. Reveal, focus and reduced-motion
+ * ========================================================================== */
+
+.ldg-root {
+  /* ---- colour ---------------------------------------------------------- */
+  --ldg-bg: #f2f6fc;
+  --ldg-bg-deep: #e6ecf8;
+  --ldg-surface: #ffffff;
+  --ldg-surface-soft: #f7f9fd;
+  --ldg-surface-sunk: #eef2f9;
+
+  --ldg-line: rgba(15, 28, 55, 0.09);
+  --ldg-line-strong: rgba(15, 28, 55, 0.16);
+
+  --ldg-ink: #0a1222;
+  --ldg-ink-2: #3f4f6e;   /* 8.1:1 on --ldg-bg */
+  --ldg-ink-3: #5a6b8c;   /* 5.4:1 on --ldg-bg */
+
+  --ldg-blue: #1d4ed8;
+  --ldg-blue-600: #2563eb;
+  --ldg-blue-400: #60a5fa;
+  --ldg-violet: #5b48d6;
+  --ldg-cyan: #0e7490;
+
+  /* ---- motion ---------------------------------------------------------- */
+  --ldg-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ldg-ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ldg-dur-1: 140ms; /* micro  — press, small state change */
+  --ldg-dur-2: 240ms; /* state   — hover, expand */
+  --ldg-dur-3: 420ms; /* scene   — section entering view */
+
+  /* ---- radii / elevation ----------------------------------------------- */
+  --ldg-r-sm: 10px;
+  --ldg-r: 16px;
+  --ldg-r-lg: 22px;
+  --ldg-r-xl: 30px;
+
+  --ldg-shadow-sm: 0 1px 2px rgba(13, 27, 54, 0.05), 0 2px 6px rgba(13, 27, 54, 0.04);
+  --ldg-shadow: 0 4px 14px rgba(13, 27, 54, 0.06), 0 1px 3px rgba(13, 27, 54, 0.04);
+  --ldg-shadow-lg: 0 28px 60px -28px rgba(13, 27, 54, 0.28), 0 10px 24px -16px rgba(13, 27, 54, 0.14);
+  --ldg-shadow-blue: 0 16px 34px -16px rgba(29, 78, 216, 0.55);
+
+  /* Pointer field, written by usePointerField. Falls back to centred. */
+  --ldg-pmx: 0;
+  --ldg-pmy: 0;
+
+  color: var(--ldg-ink);
+  background: var(--ldg-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+ * 2. Backdrop and light field
+ * ========================================================================== */
+
+.ldg-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 680px at 14% -10%, rgba(59, 130, 246, 0.16), transparent 62%),
+    radial-gradient(900px 560px at 88% 2%, rgba(99, 102, 241, 0.13), transparent 60%),
+    radial-gradient(820px 560px at 50% 106%, rgba(14, 165, 233, 0.11), transparent 60%),
+    linear-gradient(180deg, var(--ldg-bg) 0%, var(--ldg-bg-deep) 100%);
+}
+
+/* Light field: responds to the pointer with a bounded, damped offset. */
+.ldg-field {
+  position: absolute;
+  width: 58vmax;
+  height: 58vmax;
+  left: 50%;
+  top: 8%;
+  margin: -29vmax 0 0 -29vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(96, 165, 250, 0.3),
+    rgba(129, 140, 248, 0.14) 45%,
+    transparent 68%
+  );
+  filter: blur(46px);
+  transform: translate3d(
+    calc(var(--ldg-pmx) * -46px),
+    calc(var(--ldg-pmy) * -34px),
+    0
+  );
+  transition: transform 700ms var(--ldg-ease-out);
+  will-change: transform;
+}
+
+.ldg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.5;
+}
+
+.ldg-blob-a {
+  width: 44vw;
+  height: 44vw;
+  min-width: 300px;
+  min-height: 300px;
+  top: -14%;
+  left: -8%;
+  background: radial-gradient(circle at 34% 34%, rgba(59, 130, 246, 0.44), transparent 68%);
+  transform: translate3d(
+    calc(var(--ldg-pmx) * -18px),
+    calc(var(--ldg-pmy) * -14px),
+    0
+  );
+  transition: transform 900ms var(--ldg-ease-out);
+}
+
+.ldg-blob-b {
+  width: 36vw;
+  height: 36vw;
+  min-width: 240px;
+  min-height: 240px;
+  top: 26%;
+  right: -10%;
+  background: radial-gradient(circle at 60% 40%, rgba(129, 140, 248, 0.38), transparent 68%);
+  transform: translate3d(
+    calc(var(--ldg-pmx) * -26px),
+    calc(var(--ldg-pmy) * 12px),
+    0
+  );
+  transition: transform 900ms var(--ldg-ease-out);
+}
+
+.ldg-blob-c {
+  width: 32vw;
+  height: 32vw;
+  min-width: 220px;
+  min-height: 220px;
+  bottom: -16%;
+  left: 26%;
+  background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.3), transparent 70%);
+  transform: translate3d(
+    calc(var(--ldg-pmx) * -12px),
+    calc(var(--ldg-pmy) * 18px),
+    0
+  );
+  transition: transform 900ms var(--ldg-ease-out);
+}
+
+/* Very fine grid, fading out — texture without noise. */
+.ldg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15, 28, 55, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 28, 55, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(900px 560px at 50% 0%, #000 0%, transparent 76%);
+  -webkit-mask-image: radial-gradient(900px 560px at 50% 0%, #000 0%, transparent 76%);
+}
+
+/* ==========================================================================
+ * 3. Typography and layout
+ * ========================================================================== */
+
+.ldg-main {
+  position: relative;
+  z-index: 1;
+}
+
+.ldg-shell {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .ldg-shell { padding-inline: 32px; }
+}
+
+@media (min-width: 1280px) {
+  .ldg-shell { padding-inline: 40px; }
+}
+
+.ldg-section {
+  position: relative;
+  padding-block: clamp(56px, 7vw, 104px);
+  /* The in-page anchors land here; without this the sticky nav covers the
+     first line of the heading when you jump between acts. */
+  scroll-margin-top: 72px;
+}
+
+.ldg-hero { scroll-margin-top: 0; }
+
+.ldg-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ldg-blue);
+}
+
+.ldg-eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.ldg-h2 {
+  margin: 0.9rem 0 0;
+  font-size: clamp(1.6rem, 1.1rem + 1.7vw, 2.3rem);
+  font-weight: 660;
+  letter-spacing: -0.028em;
+  line-height: 1.18;
+  color: var(--ldg-ink);
+}
+
+.ldg-lede {
+  margin: 1rem 0 0;
+  max-width: 60ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.68;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-head {
+  max-width: 760px;
+  margin-bottom: clamp(2rem, 4vw, 3.25rem);
+}
+
+.ldg-head-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ldg-head-center .ldg-lede { margin-inline: auto; }
+
+.ldg-head-center .ldg-eyebrow { justify-content: center; }
+
+/* ==========================================================================
+ * 4. Buttons, chips, badges
+ * ========================================================================== */
+
+.ldg-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 48px; /* comfortable touch target */
+  padding: 0 1.4rem;
+  border-radius: var(--ldg-r);
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  /* transform + box-shadow only: never layout properties */
+  transition:
+    transform var(--ldg-dur-1) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    color var(--ldg-dur-2) var(--ldg-ease-out);
+  will-change: transform;
+}
+
+.ldg-btn-primary {
+  background: linear-gradient(135deg, var(--ldg-blue) 0%, var(--ldg-violet) 100%);
+  color: #fff;
+  box-shadow: var(--ldg-shadow-blue);
+}
+
+.ldg-btn-primary:hover {
+  background: linear-gradient(135deg, #1b45c0 0%, #4f3ad0 100%);
+  box-shadow: 0 20px 40px -16px rgba(29, 78, 216, 0.62);
+  transform: translateY(-2px);
+}
+
+.ldg-btn-primary:active { transform: translateY(1px) scale(0.994); }
+
+.ldg-btn-secondary {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: var(--ldg-line-strong);
+  color: var(--ldg-ink);
+  box-shadow: var(--ldg-shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ldg-btn-secondary:hover {
+  background: #fff;
+  border-color: rgba(29, 78, 216, 0.38);
+  box-shadow: var(--ldg-shadow);
+  transform: translateY(-2px);
+}
+
+.ldg-btn-secondary:active { transform: translateY(1px) scale(0.994); }
+
+/* Disabled: not colour alone — also loses its affordances. */
+.ldg-btn[aria-disabled='true'],
+.ldg-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.ldg-btn .ldg-btn-icon {
+  transition: transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-btn:hover .ldg-btn-icon { transform: translateX(3px); }
+
+.ldg-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+/* Chips ------------------------------------------------------------------ */
+
+.ldg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface-soft);
+  color: var(--ldg-ink-2);
+  white-space: nowrap;
+}
+
+.ldg-chip-accent {
+  background: rgba(29, 78, 216, 0.08);
+  border-color: rgba(29, 78, 216, 0.2);
+  color: var(--ldg-blue);
+}
+
+.ldg-chip-planned {
+  background: rgba(14, 116, 144, 0.07);
+  border-color: rgba(14, 116, 144, 0.2);
+  color: var(--ldg-cyan);
+}
+
+/* Interactive chip: real button affordance, not a decorative tag. */
+.ldg-chip-btn {
+  cursor: pointer;
+  transition:
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    color var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-1) var(--ldg-ease-out);
+}
+
+.ldg-chip-btn:hover {
+  background: rgba(29, 78, 216, 0.09);
+  border-color: rgba(29, 78, 216, 0.3);
+  color: var(--ldg-blue);
+  transform: translateY(-1px);
+}
+
+.ldg-chip-btn:active { transform: translateY(0); }
+
+.ldg-chip-btn[aria-pressed='true'] {
+  background: var(--ldg-blue);
+  border-color: var(--ldg-blue);
+  color: #fff;
+}
+
+/* Cards ------------------------------------------------------------------ */
+
+.ldg-card {
+  position: relative;
+  background: var(--ldg-surface);
+  border: 1px solid var(--ldg-line);
+  border-radius: var(--ldg-r-lg);
+  box-shadow: var(--ldg-shadow);
+}
+
+.ldg-card-glass {
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: var(--ldg-shadow-lg);
+}
+
+.ldg-note {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--ldg-r-sm);
+  border: 1px solid rgba(14, 116, 144, 0.18);
+  background: rgba(14, 116, 144, 0.06);
+  color: #0b5e75;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.ldg-note svg { flex-shrink: 0; margin-top: 1px; }
+
+/* ==========================================================================
+ * 5. Navigation
+ * ========================================================================== */
+
+.ldg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(242, 246, 252, 0.72);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  transition:
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-nav[data-stuck='true'] {
+  border-bottom-color: var(--ldg-line);
+  background: rgba(242, 246, 252, 0.9);
+}
+
+.ldg-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 64px;
+}
+
+.ldg-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--ldg-ink);
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  font-size: 0.98rem;
+}
+
+.ldg-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--ldg-blue) 0%, var(--ldg-violet) 100%);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 6px 14px -6px rgba(29, 78, 216, 0.7);
+}
+
+.ldg-nav-links {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 900px) {
+  .ldg-nav-links { display: flex; }
+}
+
+.ldg-nav-link {
+  position: relative;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 550;
+  color: var(--ldg-ink-2);
+  text-decoration: none;
+  transition:
+    color var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-nav-link:hover {
+  color: var(--ldg-ink);
+  background: rgba(15, 28, 55, 0.045);
+}
+
+/* Current section is marked by a bar, not by colour alone. */
+.ldg-nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ldg-blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-nav-link[aria-current='true'] {
+  color: var(--ldg-blue);
+  font-weight: 650;
+}
+
+.ldg-nav-link[aria-current='true']::after { transform: scaleX(1); }
+
+.ldg-nav-cta { display: none; }
+
+@media (min-width: 640px) {
+  .ldg-nav-cta { display: inline-flex; }
+}
+
+.ldg-btn-sm {
+  min-height: 40px;
+  padding: 0 1.05rem;
+  font-size: 0.85rem;
+  border-radius: 12px;
+}
+
+.ldg-nav-toggle { display: inline-flex; }
+
+@media (min-width: 900px) {
+  .ldg-nav-toggle { display: none; }
+}
+
+.ldg-nav-menu {
+  display: grid;
+  gap: 0.35rem;
+  padding-block: 0.75rem 1rem;
+  border-top: 1px solid var(--ldg-line);
+}
+
+/* ==========================================================================
+ * 6. Hero + concept chain
+ * ========================================================================== */
+
+.ldg-hero {
+  position: relative;
+  /* Top padding clears the 64px sticky nav at every width; the scroll-margin
+     below keeps the in-page anchors from landing underneath it. */
+  padding-block: clamp(56px, 8vw, 112px) clamp(56px, 8vw, 112px);
+}
+
+.ldg-shell {
+  scroll-margin-top: 76px;
+}
+
+.ldg-hero-grid {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+@media (min-width: 1000px) {
+  .ldg-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+  }
+}
+
+.ldg-hero-title {
+  margin: 1.1rem 0 0;
+  /* Capped below 4rem on purpose: at a ~460px hero column a larger size wraps
+     "Learn with context." onto three lines and swamps the composition. */
+  font-size: clamp(2.15rem, 1.35rem + 3.1vw, 3.35rem);
+  font-weight: 700;
+  letter-spacing: -0.038em;
+  line-height: 1.06;
+  color: var(--ldg-ink);
+}
+
+.ldg-hero-title em {
+  display: block;
+  font-style: normal;
+  background: linear-gradient(120deg, var(--ldg-blue) 0%, var(--ldg-violet) 60%, #3f7ad8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ldg-hero-sub {
+  margin: 1.35rem 0 0;
+  max-width: 48ch;
+  font-size: clamp(1.02rem, 0.97rem + 0.3vw, 1.2rem);
+  line-height: 1.62;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+/* --- concept chain ------------------------------------------------------ */
+
+.ldg-chain {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  border-radius: var(--ldg-r-xl);
+  /* Sits forward of the backdrop; the inner planes provide the depth. */
+  transform: translate3d(
+    calc(var(--ldg-pmx) * 6px),
+    calc(var(--ldg-pmy) * 5px),
+    0
+  );
+  transition: transform 600ms var(--ldg-ease-out);
+}
+
+.ldg-chain-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--ldg-line);
+}
+
+.ldg-chain-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-node {
+  position: relative;
+  display: grid;
+  /* index | copy | chevron — three columns so the chevron never wraps */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.95rem 1.05rem;
+  text-align: left;
+  border-radius: var(--ldg-r);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-node:hover {
+  border-color: rgba(29, 78, 216, 0.3);
+  box-shadow: var(--ldg-shadow);
+  transform: translateY(-2px);
+}
+
+.ldg-node:active { transform: translateY(0); }
+
+.ldg-node[aria-expanded='true'] {
+  border-color: rgba(29, 78, 216, 0.42);
+  background: linear-gradient(180deg, #fff, #f6f9ff);
+  box-shadow: var(--ldg-shadow);
+}
+
+/* Connector rail between the three nodes — the "chain". */
+.ldg-node + .ldg-node { margin-top: 1.5rem; }
+
+.ldg-node + .ldg-node::before {
+  content: '';
+  position: absolute;
+  left: 1.85rem;
+  top: -1.5rem;
+  width: 1px;
+  height: 1.5rem;
+  background: linear-gradient(180deg, var(--ldg-line-strong), rgba(29, 78, 216, 0.4));
+}
+
+.ldg-node-index {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ldg-blue), var(--ldg-violet));
+  box-shadow: 0 6px 14px -6px rgba(29, 78, 216, 0.75);
+}
+
+.ldg-node-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--ldg-ink);
+}
+
+.ldg-node-hint {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-node-body {
+  overflow: hidden;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--ldg-ink-2);
+}
+
+/* Open panel sits inline so expanding never shifts the layout unpredictably. */
+.ldg-node-detail {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--ldg-line-strong);
+  overflow: hidden;
+}
+
+.ldg-node-detail p { margin: 0 0 0.5rem; }
+.ldg-node-detail p:last-child { margin-bottom: 0; }
+
+.ldg-node-toggle {
+  margin-top: 0.15rem;
+  color: var(--ldg-ink-3);
+  transition: transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-node[aria-expanded='true'] .ldg-node-toggle { transform: rotate(180deg); }
+
+/* Floating expression tags — depth cue, also real focusable controls.
+   Only shown on wide viewports, once the hero column is wide enough that a
+   -4% offset still lands inside the shell: in the narrower layouts the offset
+   either overflowed the viewport (768px, +7px) or sat on top of the card. */
+.ldg-floaters {
+  position: absolute;
+  inset: -14px -10px -18px;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+}
+
+@media (min-width: 1180px) {
+  .ldg-floaters { display: block; }
+}
+
+.ldg-floater {
+  position: absolute;
+  pointer-events: auto;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ldg-ink-2);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--ldg-line);
+  box-shadow: var(--ldg-shadow-sm);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    transform var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    border-color var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-floater-a {
+  top: 4%;
+  left: -2%;
+  transform: translate3d(calc(var(--ldg-pmx) * 22px), calc(var(--ldg-pmy) * 16px), 0);
+}
+
+.ldg-floater-b {
+  top: 40%;
+  right: -2%;
+  transform: translate3d(calc(var(--ldg-pmx) * 28px), calc(var(--ldg-pmy) * 20px), 0);
+}
+
+.ldg-floater-c {
+  bottom: 2%;
+  left: 4%;
+  transform: translate3d(calc(var(--ldg-pmx) * 18px), calc(var(--ldg-pmy) * 24px), 0);
+}
+
+/* ==========================================================================
+ * 7. Act two — isolated vs contextual
+ * ========================================================================== */
+
+.ldg-compare {
+  display: grid;
+  gap: clamp(1rem, 2.4vw, 1.75rem);
+}
+
+@media (min-width: 860px) {
+  .ldg-compare { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+}
+
+.ldg-compare-col {
+  padding: clamp(1.25rem, 2.4vw, 1.75rem);
+  border-radius: var(--ldg-r-lg);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  box-shadow: var(--ldg-shadow-sm);
+}
+
+.ldg-compare-col[data-tone='muted'] {
+  background: var(--ldg-surface-sunk);
+  box-shadow: none;
+}
+
+.ldg-compare-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ldg-compare-col[data-tone='muted'] .ldg-compare-head { color: var(--ldg-ink-3); }
+.ldg-compare-col[data-tone='live'] .ldg-compare-head { color: var(--ldg-blue); }
+
+/* The isolated column: deliberately inert — no hover affordance at all. */
+.ldg-dead-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ldg-dead-word {
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 550;
+  color: var(--ldg-ink-3);
+  background: var(--ldg-surface);
+  border: 1px solid var(--ldg-line);
+}
+
+.ldg-sentence {
+  font-size: clamp(1.05rem, 0.98rem + 0.45vw, 1.32rem);
+  line-height: 1.75;
+  letter-spacing: -0.015em;
+  color: var(--ldg-ink);
+}
+
+.ldg-slot {
+  display: inline;
+  padding: 0.1em 0.3em;
+  margin: 0 -0.05em;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 620;
+  color: var(--ldg-blue);
+  background: rgba(29, 78, 216, 0.08);
+  transition:
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-slot:hover {
+  background: rgba(29, 78, 216, 0.15);
+  border-color: rgba(29, 78, 216, 0.3);
+}
+
+.ldg-slot[aria-pressed='true'] {
+  background: var(--ldg-blue);
+  border-color: var(--ldg-blue);
+  color: #fff;
+}
+
+.ldg-gloss {
+  margin-top: 1.1rem;
+  min-height: 92px;
+  padding: 0.9rem 1rem;
+  border-radius: var(--ldg-r);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface-soft);
+}
+
+.ldg-gloss-term {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 660;
+  color: var(--ldg-ink);
+}
+
+.ldg-gloss-zh { font-size: 0.85rem; font-weight: 500; color: var(--ldg-ink-3); }
+
+.ldg-gloss-body {
+  margin-top: 0.45rem;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-gloss-body em {
+  font-style: normal;
+  font-weight: 650;
+  color: var(--ldg-blue);
+}
+
+/* ==========================================================================
+ * 8. Act three — studio demo
+ * ========================================================================== */
+
+.ldg-demo {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+@media (min-width: 940px) {
+  .ldg-demo { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr); }
+}
+
+.ldg-scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--ldg-r-lg);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  box-shadow: var(--ldg-shadow);
+}
+
+.ldg-scene-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--ldg-surface-sunk);
+}
+
+.ldg-scene-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.9rem;
+  border-top: 1px solid var(--ldg-line);
+  background: var(--ldg-surface-soft);
+}
+
+/* Linked highlight: phrase -> objects it uses. */
+.ldg-tag {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  color: var(--ldg-ink-2);
+  transition:
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    color var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-tag[data-linked='true'] {
+  background: var(--ldg-blue);
+  border-color: var(--ldg-blue);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.ldg-phrase-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ldg-phrase {
+  width: 100%;
+  padding: 0.95rem 1.05rem;
+  text-align: left;
+  border-radius: var(--ldg-r);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-phrase:hover {
+  border-color: rgba(29, 78, 216, 0.3);
+  box-shadow: var(--ldg-shadow-sm);
+  transform: translateX(3px);
+}
+
+.ldg-phrase:active { transform: translateX(1px); }
+
+.ldg-phrase[aria-expanded='true'] {
+  border-color: rgba(29, 78, 216, 0.42);
+  background: linear-gradient(180deg, #fff, #f5f8ff);
+  box-shadow: var(--ldg-shadow);
+}
+
+.ldg-phrase-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ldg-phrase-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.97rem;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  color: var(--ldg-ink);
+}
+
+.ldg-phrase-zh {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-phrase-detail {
+  overflow: hidden;
+}
+
+.ldg-phrase-detail-inner {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--ldg-line-strong);
+  font-size: 0.86rem;
+  line-height: 1.68;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-phrase-example {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--ldg-r-sm);
+  background: var(--ldg-surface-soft);
+  border: 1px solid var(--ldg-line);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--ldg-ink);
+}
+
+.ldg-phrase-example span { color: var(--ldg-ink-3); }
+
+/* ==========================================================================
+ * 9. Act four — speaking demo
+ * ========================================================================== */
+
+.ldg-steps {
+  display: grid;
+  gap: 0.5rem;
+  counter-reset: ldg-step;
+}
+
+@media (min-width: 720px) {
+  .ldg-steps { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+.ldg-step {
+  position: relative;
+  padding: 0.9rem 0.95rem;
+  text-align: left;
+  border-radius: var(--ldg-r);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    background-color var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-step:hover {
+  border-color: rgba(29, 78, 216, 0.3);
+  box-shadow: var(--ldg-shadow-sm);
+  transform: translateY(-2px);
+}
+
+.ldg-step:active { transform: translateY(0); }
+
+.ldg-step[aria-expanded='true'] {
+  border-color: rgba(29, 78, 216, 0.45);
+  background: linear-gradient(180deg, #fff, #f5f8ff);
+  box-shadow: var(--ldg-shadow);
+}
+
+.ldg-step-num {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-step[aria-expanded='true'] .ldg-step-num { color: var(--ldg-blue); }
+
+.ldg-step-name {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  color: var(--ldg-ink);
+}
+
+.ldg-panel {
+  margin-top: clamp(1rem, 2.2vw, 1.5rem);
+  padding: clamp(1.15rem, 2.6vw, 1.9rem);
+  border-radius: var(--ldg-r-lg);
+  border: 1px solid var(--ldg-line);
+  background: var(--ldg-surface);
+  box-shadow: var(--ldg-shadow);
+}
+
+.ldg-panel-question {
+  font-size: clamp(1.08rem, 1rem + 0.5vw, 1.42rem);
+  font-weight: 640;
+  line-height: 1.42;
+  letter-spacing: -0.022em;
+  color: var(--ldg-ink);
+}
+
+.ldg-panel-list {
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ldg-panel-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-panel-item svg { margin-top: 3px; color: var(--ldg-blue); flex-shrink: 0; }
+
+.ldg-panel-item b {
+  display: block;
+  font-weight: 650;
+  color: var(--ldg-ink);
+}
+
+/* ==========================================================================
+ * 10. Planned modules + closing CTA
+ * ========================================================================== */
+
+.ldg-planned {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .ldg-planned { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .ldg-planned { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.ldg-planned-card {
+  padding: 1.15rem;
+  border-radius: var(--ldg-r);
+  border: 1px dashed var(--ldg-line-strong);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.ldg-planned-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-planned-text {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-cta {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  border-radius: var(--ldg-r-xl);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background:
+    radial-gradient(700px 320px at 18% 0%, rgba(96, 165, 250, 0.28), transparent 62%),
+    radial-gradient(620px 300px at 84% 100%, rgba(129, 140, 248, 0.26), transparent 62%),
+    linear-gradient(140deg, #f9fbff 0%, #eef3fd 100%);
+  box-shadow: var(--ldg-shadow-lg);
+}
+
+.ldg-cta-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 760px) {
+  .ldg-cta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.ldg-cta-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: clamp(1.15rem, 2.4vw, 1.6rem);
+  border-radius: var(--ldg-r-lg);
+  border: 1px solid var(--ldg-line);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    border-color var(--ldg-dur-2) var(--ldg-ease-out),
+    box-shadow var(--ldg-dur-2) var(--ldg-ease-out),
+    transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-cta-card:hover {
+  border-color: rgba(29, 78, 216, 0.34);
+  box-shadow: var(--ldg-shadow);
+  transform: translateY(-3px);
+}
+
+.ldg-cta-name {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.08rem;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  color: var(--ldg-ink);
+}
+
+.ldg-cta-text {
+  flex: 1;
+  font-size: 0.87rem;
+  line-height: 1.62;
+  color: var(--ldg-ink-2);
+}
+
+.ldg-footer {
+  position: relative;
+  z-index: 1;
+  padding-block: 2.5rem 3rem;
+  border-top: 1px solid var(--ldg-line);
+  font-size: 0.82rem;
+  color: var(--ldg-ink-3);
+}
+
+.ldg-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ldg-footer a { color: var(--ldg-ink-2); text-decoration: none; }
+.ldg-footer a:hover { color: var(--ldg-blue); text-decoration: underline; }
+
+/* ==========================================================================
+ * 11. Reveal, focus and reduced motion
+ * ========================================================================== */
+
+/* Keyboard users get a way past the navigation without tabbing the whole page.
+   Visually hidden until focused — never display:none, which would remove it
+   from the tab order. */
+.ldg-skip {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 60;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--ldg-r-sm);
+  background: var(--ldg-surface);
+  border: 1px solid var(--ldg-line-strong);
+  color: var(--ldg-ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--ldg-shadow);
+  transform: translateY(-160%);
+  transition: transform var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+.ldg-skip:focus-visible { transform: translateY(0); }
+
+/* Expander used by every "open this" control on the page.
+   Height animates with grid-template-rows 0fr -> 1fr, so there is no JS
+   measurement, no AnimatePresence teardown, and nothing can be left stranded
+   in the DOM by an interrupted exit. `visibility` is delayed until after the
+   collapse so the hidden copy leaves the tab order and the a11y tree. */
+.ldg-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--ldg-dur-2) var(--ldg-ease-out),
+    opacity var(--ldg-dur-2) var(--ldg-ease-out),
+    visibility 0s linear var(--ldg-dur-2);
+}
+
+.ldg-expand[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--ldg-dur-2) var(--ldg-ease-out),
+    opacity var(--ldg-dur-2) var(--ldg-ease-out),
+    visibility 0s linear 0s;
+}
+
+.ldg-expand-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Swap-in for panels whose whole content is replaced (no exit animation —
+   the content is simply re-keyed so this replays on every change). */
+.ldg-swap {
+  animation: ldg-swap var(--ldg-dur-2) var(--ldg-ease-out);
+}
+
+@keyframes ldg-swap {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Entrance / scroll reveal.
+   Default state is VISIBLE. Copy is only hidden once JS arms the element
+   (`data-armed`), so a page that never hydrates — or a tab backgrounded while
+   loading, where the observer never fires — still shows its content. */
+.ldg-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.ldg-reveal[data-armed='true'] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity var(--ldg-dur-3) var(--ldg-ease-out),
+    transform var(--ldg-dur-3) var(--ldg-ease-out);
+}
+
+.ldg-reveal[data-armed='true'][data-revealed='true'] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Hero entrance runs on load.
+   `animation-fill-mode: none` is deliberate: while the animation runs the
+   element sits on the keyframe values, and the instant it ends — or if
+   animations never advance — the element falls back to its normal, visible
+   styling. Nothing on this page is invisible by default. */
+.ldg-enter > * {
+  animation: ldg-enter 620ms var(--ldg-ease-out);
+  animation-delay: calc(var(--ldg-enter-step, 0) * 70ms);
+}
+
+@keyframes ldg-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ldg-root :focus-visible {
+  outline: 2px solid var(--ldg-blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Wraps any expanding region so the height change animates on the compositor
+   rather than snapping. */
+.ldg-expand {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ldg-root *,
+  .ldg-root *::before,
+  .ldg-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .ldg-field,
+  .ldg-blob,
+  .ldg-chain,
+  .ldg-floater {
+    transform: none !important;
+  }
+
+  .ldg-reveal { opacity: 1; transform: none; }
+  .ldg-btn:hover,
+  .ldg-btn-secondary:hover,
+  .ldg-btn-primary:hover { transform: none; }
+}

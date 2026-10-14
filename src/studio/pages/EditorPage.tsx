@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Poster editor — the creative workspace.
  *
  * Desktop:  navigation rail  |  poster canvas  |  content panel
@@ -272,9 +272,10 @@ export function EditorPage() {
                 aria-pressed={active}
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-semibold"
                 style={{
-                  background: active ? 'rgba(139, 92, 246, 0.16)' : 'rgba(11, 7, 23, 0.45)',
-                  border: `1px solid ${active ? 'rgba(167, 139, 250, 0.6)' : 'var(--color-ves-line)'}`,
-                  color: active ? '#fff' : 'var(--color-ves-muted)',
+                  background: active ? 'var(--color-ves-accent-tint-strong)' : 'rgba(255, 255, 255, 0.72)',
+                  border: `1px solid ${active ? 'var(--color-ves-accent-edge-strong)' : 'var(--color-ves-line-strong)'}`,
+                  color: active ? 'var(--color-ves-accent-on-tint)' : 'var(--color-ves-muted)',
+                  boxShadow: active ? 'var(--color-ves-shadow-soft)' : 'none',
                 }}
               >
                 <span
@@ -284,7 +285,7 @@ export function EditorPage() {
                     height: 18,
                     borderRadius: 999,
                     background: `linear-gradient(135deg, ${theme.bg} 55%, ${theme.accent} 55%)`,
-                    border: '1px solid rgba(216,204,255,0.35)',
+                    border: '1px solid rgba(16,35,74,0.22)',
                   }}
                 />
                 {theme.label}
@@ -303,7 +304,7 @@ export function EditorPage() {
         onAdd={() => addListItem('vocabulary', { term: '', translation: '', explanation: '' })}
       >
         {content.vocabulary.map((item, index) => (
-          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(11, 7, 23, 0.35)' }}>
+          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(255, 255, 255, 0.72)' }}>
             <div className="flex gap-2">
               <input
                 className="ves-input"
@@ -340,7 +341,7 @@ export function EditorPage() {
         onAdd={() => addListItem('phrases', { phrase: '', translation: '', explanation: '', example: '' })}
       >
         {content.phrases.map((item, index) => (
-          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(11, 7, 23, 0.35)' }}>
+          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(255, 255, 255, 0.72)' }}>
             <div className="flex gap-2">
               <input
                 className="ves-input"
@@ -391,7 +392,7 @@ export function EditorPage() {
         }
       >
         {content.sentencePatterns.map((item, index) => (
-          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(11, 7, 23, 0.35)' }}>
+          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(255, 255, 255, 0.72)' }}>
             <input
               className="ves-input"
               value={item.pattern}
@@ -471,7 +472,7 @@ export function EditorPage() {
         onAdd={() => addListItem('speakingChallenges', { question: '', translation: '' })}
       >
         {content.speakingChallenges.map((item, index) => (
-          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(11, 7, 23, 0.35)' }}>
+          <div key={index} className="grid gap-2 rounded-xl p-3" style={{ background: 'rgba(255, 255, 255, 0.72)' }}>
             <textarea
               className="ves-textarea"
               value={item.question}
@@ -570,7 +571,11 @@ export function EditorPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_360px] lg:grid-cols-[220px_minmax(0,1fr)_380px]">
+      {/* `grid-cols-1` matters: without an explicit track the implicit column is
+          floored at the poster preview's intrinsic width and overflows the page
+          below `md`. The `minmax(0, …)` md/lg tracks prevent the same thing
+          once the sidebars appear. */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_360px] lg:grid-cols-[220px_minmax(0,1fr)_380px]">
         {/* Left rail (desktop) */}
         <aside className="hidden lg:block">
           <div className="ves-glass sticky top-24 p-5">
@@ -704,11 +709,11 @@ export function EditorPage() {
             <div
               className="mt-4 flex items-start gap-3 rounded-2xl p-4"
               role="alert"
-              style={{ background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.35)' }}
+              style={{ background: 'rgba(192, 52, 44, 0.07)', border: '1px solid rgba(192, 52, 44, 0.28)' }}
             >
               <CircleAlert size={17} strokeWidth={2} style={{ color: 'var(--color-ves-danger)', flex: 'none', marginTop: 1 }} />
               <div className="flex-1">
-                <p className="text-[13.5px]" style={{ color: '#FCA5A5' }}>
+                <p className="text-[13.5px]" style={{ color: 'var(--color-ves-danger)' }}>
                   {actionError}
                 </p>
               </div>
@@ -748,10 +753,11 @@ export function EditorPage() {
       <div
         className="ves-safe-bottom fixed inset-x-0 bottom-0 z-40 md:hidden"
         style={{
-          background: 'rgba(11, 7, 23, 0.82)',
-          backdropFilter: 'blur(18px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-          borderTop: '1px solid var(--color-ves-line)',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(18px) saturate(170%)',
+          WebkitBackdropFilter: 'blur(18px) saturate(170%)',
+          borderTop: '1px solid var(--color-ves-line-strong)',
+          boxShadow: '0 -8px 24px -18px rgba(16, 35, 74, 0.5)',
         }}
       >
         <div className="flex items-center gap-2 px-4 py-3">

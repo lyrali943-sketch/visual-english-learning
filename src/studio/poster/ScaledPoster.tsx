@@ -41,7 +41,20 @@ export function ScaledPoster({ poster, posterRef, maxWidth = POSTER_LOGICAL_WIDT
   }, [maxWidth])
 
   return (
-    <div ref={containerRef} className={className} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+    <div
+      ref={containerRef}
+      className={className}
+      style={{
+        width: '100%',
+        maxWidth: '100%',
+        // Without an explicit zero minimum the element reports an intrinsic
+        // width of 800px to its parent grid/flex track, which pins the track
+        // open and causes page-level horizontal overflow on narrow screens.
+        minWidth: 0,
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
       <div
         style={{
           width: POSTER_LOGICAL_WIDTH * scale,

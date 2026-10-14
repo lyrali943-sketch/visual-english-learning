@@ -85,7 +85,11 @@ export function HomePage() {
 
   return (
     <div className="mx-auto w-full max-w-[1240px] px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
-      <section className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16">
+      {/* `grid-cols-1` (and `minmax(0, …)` at lg) is required, not cosmetic:
+          an auto/implicit grid track is floored at the poster preview's
+          intrinsic width, so the column refuses to shrink below ~470px and
+          pushes the whole page into horizontal overflow on phones. */}
+      <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:gap-16">
         <motion.div {...fade}>
           <span className="ves-chip ves-chip-accent">
             <Sparkles size={13} strokeWidth={2} />
@@ -122,12 +126,12 @@ export function HomePage() {
               className="mt-5 max-w-[520px] rounded-2xl px-4 py-3 text-[13px] leading-relaxed"
               style={{
                 color: 'var(--color-ves-muted)',
-                background: 'rgba(139, 92, 246, 0.1)',
-                border: '1px solid rgba(167, 139, 250, 0.28)',
+                background: 'var(--color-ves-accent-tint)',
+                border: '1px solid var(--color-ves-accent-edge)',
               }}
             >
-              <strong style={{ color: 'var(--color-ves-lavender)' }}>Demo mode.</strong> No AI provider is configured yet, so
-              the sample poster beside this text shows the full experience with clearly-labelled sample content.
+              <strong style={{ color: 'var(--color-ves-accent-on-tint)' }}>Demo mode.</strong> No AI provider is configured
+              yet, so the sample poster beside this text shows the full experience with clearly-labelled sample content.
             </p>
           ) : null}
 
@@ -137,9 +141,9 @@ export function HomePage() {
                 <span
                   className="flex h-9 w-9 items-center justify-center rounded-xl"
                   style={{
-                    background: 'rgba(139, 92, 246, 0.14)',
-                    border: '1px solid rgba(167, 139, 250, 0.3)',
-                    color: 'var(--color-ves-violet)',
+                    background: 'var(--color-ves-accent-tint)',
+                    border: '1px solid var(--color-ves-accent-edge)',
+                    color: 'var(--color-ves-accent-on-tint)',
                   }}
                 >
                   <item.icon size={17} strokeWidth={1.9} />
@@ -164,8 +168,12 @@ export function HomePage() {
             aria-hidden="true"
             className="pointer-events-none absolute"
             style={{
-              inset: '-8% -6% 4% -6%',
-              background: 'radial-gradient(60% 55% at 50% 45%, rgba(139, 92, 246, 0.28), transparent 70%)',
+              /* No horizontal bleed: `inset` with a negative right/left pushed
+                 the glow past the viewport and widened the document by ~24px at
+                 desktop widths. Clipped vertically only, which is invisible
+                 under a 40px blur. */
+              inset: '-8% 0 4% 0',
+              background: 'radial-gradient(60% 55% at 50% 45%, rgba(47, 95, 224, 0.3), transparent 70%)',
               filter: 'blur(40px)',
             }}
           />
@@ -207,9 +215,9 @@ export function HomePage() {
                 <span
                   className="flex h-10 w-10 items-center justify-center rounded-2xl"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(139,92,246,0.9), rgba(109,93,251,0.9))',
+                    background: 'var(--color-ves-accent-fill)',
                     color: '#fff',
-                    boxShadow: '0 8px 20px -8px rgba(139, 92, 246, 0.8)',
+                    boxShadow: '0 8px 20px -10px rgba(47, 95, 224, 0.75)',
                   }}
                 >
                   <step.icon size={18} strokeWidth={1.9} />
